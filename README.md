@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/repo-banner.svg" alt="Heritrix Banner" width="100%">
+  <img src="assets/repo-banner.png" alt="Heritrix Banner" width="100%">
 </p>
 
 # 🧬 Heritrix
