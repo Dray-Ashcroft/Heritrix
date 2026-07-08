@@ -1,77 +1,42 @@
 <p align="center">
-  <img src="assets/repo-banner.png" alt="Heritrix Banner" width="100%">
+  <img src="assets/repo-banner.svg" alt="Heritrix Banner" width="100%">
 </p>
 
 # 🧬 Heritrix
+### Interactive Pedigree & Mendelian Simulator
 
-### Interactive Pedigree Simulator
-
-Heritrix is an interactive pedigree analysis tool designed to visualize Mendelian inheritance through animated family trees, genetic crosses, and real-time probability calculations.
-
----
-
-## ✨ Features
-
-- Interactive pedigree visualization
-- Four inheritance modes
-- Custom cross builder
-- Real-time genotype & phenotype prediction
-- Animated pedigree generation
-- Probability calculator
-- Responsive design
-- Browser-based — no installation required
+**Heritrix** is an open-source simulation engine designed for genetic analysis. It enables real-time visualization of inheritance patterns, custom cross-building, and stochastic probability modeling.
 
 ---
 
-## 🧬 Inheritance Modes
+## 🚀 Core Functionality
 
-- Autosomal Dominant
-- Autosomal Recessive
-- X-Linked Dominant
-- X-Linked Recessive
-- Custom Cross Mode
----
-
-## 🎓 Built For
-
-- Class XI & XII Biology
-- Genetics
-- Mendelian Inheritance
-- Interactive Classroom Teaching
-- NCERT-aligned learning
+* **Inheritance Engines:** Support for Autosomal (Dominant/Recessive) and X-Linked (Dominant/Recessive) models.
+* **Custom Cross Builder:** Define parental genotypes to simulate phenotypic outcomes.
+* **Real-time Analysis:** Instant genotype/phenotype prediction and probability mapping.
+* **Pedigree Architect:** Dynamic, interactive generation of multi-generational family trees.
 
 ---
 
-## 👨‍🔬 Author
+## 🎓 Academic Alignment
 
-**Draven Ashcroft**
-
-*M.Sc. Agricultural Entomology*  
-*ASRB–NET Qualified*  
-*DIPS Chain of Institutions, Tanda*
-
----
-
-## 🙏 Acknowledgements
-
-Developed through a collaborative human–AI workflow.
-
-- **Claude** — Core implementation & optimization
-- **OpenAI** — Scientific review & debugging
-- **Google Gemini** — Concept refinement
+Designed for clarity in secondary and higher education (Biology/Genetics curriculum). Ideal for demonstrating complex Mendelian principles through interactive experimentation.
 
 ---
 
 ## 📄 License
 
-GNU General Public License v3.0 (GPL-3.0).
+GNU General Public License v3.0 (GPL-3.0)
+
+---
+
+## 👨‍🔬 Author
+
+**Draven Ashcroft**  
+*M.Sc. Agricultural Entomology | ASRB–NET Qualified*
 
 ---
 
 <p align="center">
-
-# 🧬 Heritrix
-
-### *Visualizing the Patterns of Inheritance.*
-
+  <i>"Visualizing the patterns of inheritance."</i>
 </p>
