@@ -3,40 +3,52 @@
 </p>
 
 # 🧬 Heritrix
-### Interactive Pedigree & Mendelian Simulator
 
-**Heritrix** is an open-source simulation engine designed for genetic analysis. It enables real-time visualization of inheritance patterns, custom cross-building, and stochastic probability modeling.
+### *Interactive Pedigree & Mendelian Simulator*
 
----
+> An educational genetics simulator for exploring Mendelian inheritance, pedigree analysis, genotype–phenotype relationships, and probability through interactive experimentation.
 
-## 🚀 Core Functionality
-
-* **Inheritance Engines:** Support for Autosomal (Dominant/Recessive) and X-Linked (Dominant/Recessive) models.
-* **Custom Cross Builder:** Define parental genotypes to simulate phenotypic outcomes.
-* **Real-time Analysis:** Instant genotype/phenotype prediction and probability mapping.
-* **Pedigree Architect:** Dynamic, interactive generation of multi-generational family trees.
+**🧬 Genetics · 🧬 Mendelian Inheritance · 🌳 Pedigree Analysis**
 
 ---
 
-## 🎓 Academic Alignment
+## ✦ Features
 
-Designed for clarity in secondary and higher education (Biology/Genetics curriculum). Ideal for demonstrating complex Mendelian principles through interactive experimentation.
+**🧬 Inheritance Models**  
+Simulate autosomal dominant, autosomal recessive, X-linked dominant, and X-linked recessive inheritance.
+
+**🧪 Custom Cross Builder**  
+Define parental genotypes and explore predicted offspring genotypes and phenotypes.
+
+**📊 Probability Analysis**  
+Visualize genotype and phenotype probabilities generated from genetic crosses.
+
+**🌳 Pedigree Architect**  
+Build and explore multi-generational pedigrees for inheritance analysis.
+
+**🔬 Genotype–Phenotype Visualization**  
+Connect genetic combinations with their expected phenotypic outcomes.
+
+**📚 Educational Visualization**  
+Designed to support school-level and higher-education concepts in Mendelian genetics.
 
 ---
 
-## 📄 License
+## 🧬 Inheritance Models
 
-GNU General Public License v3.0 (GPL-3.0)
-
----
-
-## 👨‍🔬 Author
-
-**Draven Ashcroft**  
-*M.Sc. Agricultural Entomology | ASRB–NET Qualified*
+**Autosomal Dominant · Autosomal Recessive · X-Linked Dominant · X-Linked Recessive**
 
 ---
 
-<p align="center">
-  <i>"Visualizing the patterns of inheritance."</i>
-</p>
+## ⚙️ Technology
+
+**HTML · CSS · JavaScript**
+
+**Source:** GitHub  
+**Hosting:** GitHub Pages
+
+---
+
+## 📜 License
+
+**GNU General Public License v3.0 (GPL-3.0)**
