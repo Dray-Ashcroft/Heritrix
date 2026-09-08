@@ -10,7 +10,7 @@
 >
 > 🧬 **Genetics** · 🧬 **Mendelian Inheritance** · 🌳 **Pedigree Analysis**
 
-**🔬 [Explore the Simulation](YOUR-LINK-HERE)**
+**🔬 [Explore the Simulation](https://heritrix.dray-ashcroft.workers.dev/)**
 
 ---
 
