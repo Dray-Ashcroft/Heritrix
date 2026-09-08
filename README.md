@@ -1,14 +1,16 @@
 <p align="center">
-  <img src="assets/repo-banner.png" alt="Heritrix Banner" width="100%">
+  <img src="assets/repo-banner.png" alt="Heritrix — Interactive Pedigree & Mendelian Simulator" width="100%">
 </p>
 
 # 🧬 Heritrix
 
 ### *Interactive Pedigree & Mendelian Simulator*
 
-> An educational genetics simulator for exploring Mendelian inheritance, pedigree analysis, genotype–phenotype relationships, and probability through interactive experimentation.
+> **Heritrix** is an interactive visualization exploring **Mendelian inheritance, pedigree analysis, genotype–phenotype relationships, and genetic probability**.
+>
+> 🧬 **Genetics** · 🧬 **Mendelian Inheritance** · 🌳 **Pedigree Analysis**
 
-**🧬 Genetics · 🧬 Mendelian Inheritance · 🌳 Pedigree Analysis**
+**🔬 [Explore the Simulation](YOUR-LINK-HERE)**
 
 ---
 
@@ -21,16 +23,16 @@ Simulate autosomal dominant, autosomal recessive, X-linked dominant, and X-linke
 Define parental genotypes and explore predicted offspring genotypes and phenotypes.
 
 **📊 Probability Analysis**  
-Visualize genotype and phenotype probabilities generated from genetic crosses.
+Visualize genotype and phenotype probabilities from genetic crosses.
 
 **🌳 Pedigree Architect**  
 Build and explore multi-generational pedigrees for inheritance analysis.
 
 **🔬 Genotype–Phenotype Visualization**  
-Connect genetic combinations with their expected phenotypic outcomes.
+Explore relationships between genetic combinations and phenotypic outcomes.
 
 **📚 Educational Visualization**  
-Designed to support school-level and higher-education concepts in Mendelian genetics.
+Supports school-level and higher-education concepts in Mendelian genetics.
 
 ---
 
@@ -44,11 +46,11 @@ Designed to support school-level and higher-education concepts in Mendelian gene
 
 **HTML · CSS · JavaScript**
 
-**Source:** GitHub  
-**Hosting:** GitHub Pages
+**Repository:** GitHub & Codeberg  
+**Hosting:** Cloudflare
 
 ---
 
 ## 📜 License
 
-**GNU General Public License v3.0 (GPL-3.0)**
+Distributed under the **GNU General Public License v3.0 (GPL-3.0)**.
