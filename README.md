@@ -8,7 +8,7 @@
 
 > **Heritrix** is an interactive visualization exploring **Mendelian inheritance, pedigree analysis, genotype–phenotype relationships, and genetic probability**.
 >
-> 🧬 **Genetics** · 🧬 **Mendelian Inheritance** · 🌳 **Pedigree Analysis**
+ 🧬 **Genetics** · 🧬 **Mendelian Inheritance** · 🌳 **Pedigree Analysis**
 
 **🔬 [Explore the Simulation](https://heritrix.dray-ashcroft.workers.dev/)**
 
