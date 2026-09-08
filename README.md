@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/repo-banner.png" alt="Heritrix — Interactive Pedigree & Mendelian Simulator" width="100%">
+  <img src="assets/banner.png" alt="Heritrix — Interactive Pedigree & Mendelian Simulator" width="100%">
 </p>
 
 # 🧬 Heritrix
