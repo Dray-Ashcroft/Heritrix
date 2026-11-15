@@ -368,7 +368,7 @@ function renderInstant(key){
   });
 }
 function replay(){
-  if(!currentMode) return setMode(lastRealMode);
+  if(!currentMode) return;
   if(currentMode==='cc'){ clearAllTimers(); resetAllPersons(); resetLineColors(); if(MODES.cc&&MODES.cc.genotypes.p1_1) runSimulation('cc'); return; }
   setMode(currentMode);
 }
@@ -439,10 +439,19 @@ function runSimulation(modeKey){
 // INFO PANEL
 // ═══════════════════════════════════════════
 function updateInfoPanel(modeKey){
-  const color = modeKey ? MODES[modeKey].color : modeColor('cc');
-  document.documentElement.style.setProperty('--mc', color);
-  document.getElementById('chart-title').textContent = modeKey ? MODE_TITLES[modeKey] : MODE_TITLES.cc;
   const custom = modeKey==='cc' || (!modeKey && document.getElementById('tab-cc').classList.contains('active'));
+  const color = modeKey ? MODES[modeKey].color : custom ? modeColor('cc') : 'var(--text)';
+  document.documentElement.style.setProperty('--mc', color);
+  document.getElementById('chart-title').textContent = modeKey ? MODE_TITLES[modeKey] : custom ? MODE_TITLES.cc : 'Pick an inheritance pattern';
+  document.getElementById('chart-tools').style.visibility = (modeKey || custom) ? '' : 'hidden';
+  document.getElementById('prob-panel').hidden = !modeKey;
+  if(!modeKey && !custom){
+    document.getElementById('side-kicker').textContent = 'Getting started';
+    document.getElementById('side-title').textContent = 'Choose a pattern above';
+    document.getElementById('side-desc').innerHTML = 'Each tab shows how a trait passes through three generations of one family. Tap any symbol for its genotype and an explanation, or use <b>Custom cross</b> to build your own family.';
+  } else if(modeKey && !custom){
+    document.getElementById('side-kicker').textContent = 'Inheritance pattern';
+  }
   document.getElementById('side-info').hidden = custom;
   document.getElementById('side-custom').hidden = !custom;
   const m = modeKey ? MODES[modeKey] : null;
@@ -1021,6 +1030,6 @@ function initialize(){
     }
   });
   setPauseBtn(false);
-  later(()=>setMode('xlr'),400);
+  updateInfoPanel(null);   // start empty until a pattern is chosen
 }
 window.addEventListener('DOMContentLoaded',initialize);

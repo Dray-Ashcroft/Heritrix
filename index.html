@@ -34,7 +34,7 @@
     <section class="card chart-card" id="chart-card">
       <div class="chart-head">
         <div class="chart-title" id="chart-title"></div>
-        <div class="chart-tools">
+        <div class="chart-tools" id="chart-tools">
           <button class="icon-btn" id="btn-replay" onclick="replay()" title="Replay (R)" aria-label="Replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>
           <button class="icon-btn" id="btn-pause" onclick="togglePause()" title="Pause (P)" aria-label="Pause"></button>
           <button class="icon-btn speed" id="speed-val" onclick="cycleSpeed()" title="Animation speed">1×</button>
@@ -172,10 +172,10 @@
     </section>
 
     <aside class="card side" id="side-info">
-      <div class="kicker">Inheritance pattern</div>
+      <div class="kicker" id="side-kicker">Inheritance pattern</div>
       <h2 id="side-title"></h2>
       <p class="side-desc" id="side-desc"></p>
-      <div class="prob-panel">
+      <div class="prob-panel" id="prob-panel">
         <div class="prob-title">Children of II-4 × II-5</div>
         <div class="prob-mating" id="prob-mating"></div>
         <div id="prob-bars"></div>

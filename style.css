@@ -92,7 +92,7 @@ svg#pedigree-lines { position: absolute; top: 0; left: 0; width: 100%; height: 1
 
 /* ── Side panel ── */
 .side { padding: 18px; position: sticky; top: 14px; }
-.side[hidden] { display: none; }
+.side[hidden], .prob-panel[hidden] { display: none; }
 .kicker { font-family: 'IBM Plex Mono', monospace; font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; color: var(--text-faint); margin-bottom: 6px; }
 .side h2 { font-size: 1.05rem; font-weight: 600; color: var(--mc); margin-bottom: 8px; transition: color .3s; }
 .side-desc { font-size: .84rem; line-height: 1.65; color: var(--text-dim); margin-bottom: 14px; }
