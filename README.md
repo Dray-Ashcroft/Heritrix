@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.png" alt="Heritrix — Pedigree and Mendelian Inheritance Simulator" width="100%">
+  <img src="banner/banner.png" alt="Heritrix — Pedigree and Mendelian Inheritance Simulator" width="100%">
 </p>
 
 <h1 align="center">Heritrix</h1>
