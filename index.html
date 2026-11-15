@@ -3,439 +3,44 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Heritrix: Pedigree Simulator</title>
+<title>Heritrix · Pedigree Simulator</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #131312;
-  --surface: #1e1e1c;
-  --surface2: #272725;
-  --border: #2e2e2b;
-  --border2: #3a3a37;
-  --text: #e8e8e2;
-  --text-dim: #8a8a82;
-  --text-faint: #55554f;
-  --line-default: #3a3a37;
-  --ad:  #d946ef;
-  --ar:  #f59e0b;
-  --xlr: #38bdf8;
-  --xld: #4ade80;
-  --shadow-sm: 0 1px 3px rgba(0,0,0,.35), 0 1px 2px rgba(0,0,0,.25);
-  --shadow-md: 0 4px 16px rgba(0,0,0,.45), 0 1px 4px rgba(0,0,0,.3);
-  --shadow-lg: 0 16px 48px rgba(0,0,0,.6), 0 4px 12px rgba(0,0,0,.35);
-  --cc: #a78bfa;
-}
+<link rel="stylesheet" href="style.css">
 
-body {
-  background: var(--bg); color: var(--text);
-  font-family: 'IBM Plex Sans', system-ui, sans-serif;
-  min-height: 100vh;
-  transition: background .3s ease, color .3s ease;
-}
-.app { max-width: 1200px; margin: 0 auto; padding: 28px 20px; }
-header {
-  text-align: center; margin-bottom: 28px;
-  border-bottom: 1px solid var(--border); padding-bottom: 20px;
-}
-.title {
-  font-family: 'IBM Plex Sans', sans-serif; font-weight: 600;
-  font-size: clamp(1.45rem, 3vw, 2.2rem); letter-spacing: -.035em;
-  background: linear-gradient(120deg, #e8e8e2 30%, #8a8a82 100%);
-  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-  line-height: 1.15;
-}
-
-.subtitle { font-size: .68rem; color: var(--text-faint); margin-top: 7px; letter-spacing: .18em; text-transform: uppercase; font-weight: 500; }
-
-/* CONTROLS */
-.controls-bar { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-bottom: 12px; }
-.btn {
-  font-family: 'IBM Plex Sans', sans-serif; font-size: .72rem; font-weight: 500; letter-spacing: .01em;
-  padding: 7px 13px; border: 1px solid var(--border); background: var(--surface);
-  color: var(--text-dim); border-radius: 6px; cursor: pointer; transition: all .15s ease;
-  text-transform: none; position: relative; overflow: hidden;
-  box-shadow: var(--shadow-sm);
-}
-.btn:hover { background: var(--surface2); color: var(--text); border-color: var(--border2); }
-.btn.active { color: var(--text); background: var(--surface); border-color: currentColor; box-shadow: var(--shadow-sm); }
-.btn-ad.active  { color: var(--ad);  border-color: var(--ad);  background: rgba(217,70,239,.12); }
-.btn-ar.active  { color: var(--ar);  border-color: var(--ar);  background: rgba(245,158,11,.12); }
-.btn-xlr.active { color: var(--xlr); border-color: var(--xlr); background: rgba(56,189,248,.12); }
-.btn-xld.active { color: var(--xld); border-color: var(--xld); background: rgba(74,222,128,.12); }
-.btn-reset  { color: #f87171; }
-.btn-pause  { color: var(--text-dim); }
-.sh { font-size: .58rem; opacity: .4; display: block; margin-top: 1px; font-family: 'IBM Plex Mono', monospace; }
-
-/* SPEED */
-.speed-row { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 14px; }
-.slabel { font-family: 'IBM Plex Mono', monospace; font-size: .62rem; color: var(--text-faint); letter-spacing: .06em; text-transform: uppercase; }
-input[type=range] { -webkit-appearance: none; appearance: none; width: 120px; height: 2px; background: var(--border2); border-radius: 2px; outline: none; cursor: pointer; }
-input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--text); cursor: pointer; box-shadow: var(--shadow-sm); }
-.sval { font-family: 'IBM Plex Mono', monospace; font-size: .62rem; color: var(--text); width: 26px; }
-
-/* STEP DOTS */
-.step-indicator { display: flex; align-items: center; justify-content: center; gap: 6px; margin-bottom: 16px; min-height: 18px; }
-
-/* MAIN LAYOUT */
-.main-panel { display: grid; grid-template-columns: 1fr 296px; gap: 16px; align-items: start; }
-@media(max-width:820px){ .main-panel { grid-template-columns: 1fr; } }
-
-/* CHART */
-.chart-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 10px; padding: 24px 16px 24px 20px;
-  position: relative; box-shadow: var(--shadow-sm);
-  overflow-x: auto;
-}
-.chart-inner { position: relative; width: 100%; min-height: 360px; min-width: 420px; }
-svg#pedigree-lines { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
-
-/* GEN ROWS */
-.generation-row { display: flex; align-items: center; justify-content: center; gap: 24px; position: relative; z-index: 2; }
-.gen-i   { padding-top: 16px; }
-.gen-ii  { padding-top: 115px; }
-.gen-iii { padding-top: 214px; padding-bottom: 16px; }
-.person-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; }
-.person-name { font-size: clamp(0.7rem, 1.8vw, 0.82rem); color: var(--text-faint); letter-spacing: .01em; text-align: center; font-weight: 500; white-space: nowrap; font-family: 'IBM Plex Mono', monospace; margin-top: 6px; }
-
-/* PERSON SYMBOL */
-.person-symbol { width: 46px; height: 46px; flex-shrink: 0; cursor: pointer; transition: opacity .3s ease, transform .2s ease; }
-.person-symbol:hover { transform: scale(1.08); opacity: .85; }
-.person-symbol .sym-shape { transition: fill .4s ease, stroke .4s ease; }
-.person-symbol .sym-carrier-fill { transition: fill .4s ease; fill: none; }
-.sym-gender-icon {
-  fill: none;
-  stroke: rgba(255,255,255,0.75);
-  stroke-width: 2.2px;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-  pointer-events: none;
-}
-
-@keyframes pulseAffected {
-  0%,100% { filter: drop-shadow(0 0 3px currentColor); }
-  50%      { filter: drop-shadow(0 0 8px currentColor) drop-shadow(0 0 16px currentColor); }
-}
-.person-symbol.affected { animation: pulseAffected 2.4s ease-in-out infinite; }
-
-/* GEN LABELS */
-.gen-row-label { display: none; }
-
-/* LEFT GEN RAIL */
-.gen-rail {
-  position: absolute; left: 0; top: 0; bottom: 0;
-  width: 52px; pointer-events: none; z-index: 3;
-}
-.gen-rail-label {
-  position: absolute; left: 0;
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: .55rem; font-weight: 600;
-  color: var(--text-faint); letter-spacing: .08em;
-  text-transform: uppercase; white-space: nowrap;
-  transition: color .35s ease; transform: translateY(-50%);
-  background: var(--surface); padding-right: 6px; line-height: 1;
-}
-.gen-rail-label.glow { color: var(--gc, var(--text)); }
-
-/* TOOLTIP */
-.genotype-tooltip {
-  position: fixed; z-index: 900; pointer-events: none;
-  background: var(--surface); border: 1px solid var(--border2);
-  border-radius: 7px; padding: 8px 12px;
-  font-family: 'IBM Plex Sans', sans-serif; min-width: 100px;
-  box-shadow: var(--shadow-md); opacity: 0; transition: opacity .12s ease; transform: translate(-50%,-115%);
-}
-.genotype-tooltip.vis { opacity: 1; }
-/* Genotype superscripts */
-.tt-gt sup, .modal-gt-val sup, .cc-punnett-cell sup,
-.cc-prob-lbl sup, .cc-gt-btn sup { font-size: .65em; vertical-align: super; line-height: 0; }
-.tt-gt { font-size: 1rem; font-weight: 600; font-family: 'IBM Plex Mono', monospace; color: var(--text); }
-.tt-lbl { font-size: .68rem; color: var(--text-dim); margin-top: 2px; }
-
-/* INFO PANEL */
-.info-card {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 10px; padding: 18px;
-  position: sticky; top: 16px; box-shadow: var(--shadow-sm);
-}
-.info-title { font-family: 'IBM Plex Mono', monospace; font-size: .58rem; letter-spacing: .08em; margin-bottom: 12px; text-transform: uppercase; color: var(--text-faint); }
-.mode-badge {
-  display: flex; align-items: center; gap: 10px;
-  margin-bottom: 11px; padding: 10px 12px;
-  border-radius: 7px; border: 1px solid var(--border);
-  background: var(--surface2); transition: border-color .3s ease;
-}
-.mode-icon { font-size: 1.1rem; }
-.mode-name { font-family: 'IBM Plex Sans', sans-serif; font-size: .75rem; font-weight: 600; letter-spacing: .01em; line-height: 1.3; }
-.mode-desc { font-size: .78rem; line-height: 1.7; color: var(--text-dim); margin-bottom: 12px; }
-
-/* PROB PANEL */
-.prob-panel { margin-bottom: 12px; background: var(--surface2); border: 1px solid var(--border); border-radius: 7px; padding: 10px 12px; }
-.prob-title { font-family: 'IBM Plex Mono', monospace; font-size: .52rem; color: var(--text-dim); letter-spacing: .08em; margin-bottom: 7px; text-transform: uppercase; }
-.prob-mating { font-size: .69rem; color: var(--text); margin-bottom: 8px; font-style: italic; font-family: 'IBM Plex Mono', monospace; opacity: .7; }
-.prob-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
-.prob-bar-wrap { flex: 1; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
-.prob-bar { height: 100%; border-radius: 2px; transition: width .7s ease; width: 0%; }
-.prob-pct { font-family: 'IBM Plex Mono', monospace; font-size: .57rem; color: var(--text); width: 28px; text-align: right; }
-.prob-lbl { font-size: .68rem; color: var(--text-dim); width: 120px; }
-
-/* LEGEND */
-.legend { border-top: 1px solid var(--border); padding-top: 11px; }
-.legend-title { font-family: 'IBM Plex Mono', monospace; font-size: .52rem; color: var(--text-faint); letter-spacing: .1em; margin-bottom: 8px; text-transform: uppercase; }
-.legend-items { display: flex; flex-direction: column; gap: 6px; }
-.legend-item { display: flex; align-items: center; gap: 8px; font-size: .74rem; color: var(--text-dim); transition: opacity .3s, max-height .3s; overflow: hidden; max-height: 30px; }
-.legend-item.leg-hidden { opacity: 0; max-height: 0; pointer-events: none; }
-.legend-sym { width: 18px; height: 18px; flex-shrink: 0; }
-
-/* KBD */
-.kbd-hints { margin-top: 12px; border-top: 1px solid var(--border); padding-top: 10px; display: grid; grid-template-columns: 1fr 1fr; gap: 4px; }
-.kbd-item { display: flex; align-items: center; gap: 5px; font-size: .67rem; color: var(--text-dim); }
-.kbd { font-family: 'IBM Plex Mono', monospace; font-size: .54rem; background: var(--surface2); border: 1px solid var(--border2); border-radius: 3px; padding: 1px 5px; color: var(--text); }
-.click-hint { grid-column: span 2; font-size: .62rem; color: var(--text-faint); margin-top: 3px; }
-
-/* MODAL */
-.modal-overlay {
-  position: fixed; inset: 0; z-index: 2000;
-  background: rgba(0,0,0,.65); backdrop-filter: blur(6px);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; pointer-events: none; transition: opacity .2s;
-}
-.modal-overlay.open { opacity: 1; pointer-events: all; }
-.modal {
-  background: var(--surface); border: 1px solid var(--border);
-  border-radius: 12px; padding: 24px 26px; max-width: 420px; width: 92%;
-  position: relative; box-shadow: var(--shadow-lg);
-  transform: translateY(10px); transition: transform .22s ease;
-}
-.modal-overlay.open .modal { transform: translateY(0); }
-.modal-bar { height: 3px; border-radius: 2px; margin-bottom: 18px; }
-.modal-close {
-  position: absolute; top: 14px; right: 14px; background: none; border: none;
-  color: var(--text-faint); font-size: 1.1rem; cursor: pointer; transition: color .15s; line-height: 1;
-}
-.modal-close:hover { color: var(--text); }
-.modal-person-header { display: flex; align-items: center; gap: 14px; margin-bottom: 18px; }
-.modal-sym-wrap { width: 60px; height: 60px; flex-shrink: 0; }
-.modal-person-title { font-family: 'IBM Plex Sans', sans-serif; font-size: .9rem; font-weight: 600; color: var(--text); }
-.modal-person-sub { font-size: .73rem; color: var(--text-dim); margin-top: 3px; }
-.modal-gt-box { border-radius: 7px; padding: 12px 14px; margin-bottom: 14px; border: 1px solid; background: var(--surface2); }
-.modal-gt-label { font-family: 'IBM Plex Mono', monospace; font-size: .52rem; color: var(--text-faint); letter-spacing: .1em; margin-bottom: 5px; text-transform: uppercase; }
-.modal-gt-val { font-size: 1.4rem; font-weight: 600; font-family: 'IBM Plex Mono', monospace; letter-spacing: .02em; }
-.modal-gt-status { font-size: .73rem; margin-top: 4px; opacity: .75; }
-.modal-exp { font-size: .81rem; line-height: 1.72; color: var(--text-dim); background: var(--surface2); border-radius: 6px; padding: 12px 14px; border-left: 3px solid; }
-.modal-exp-label { font-family: 'IBM Plex Mono', monospace; font-size: .52rem; color: var(--text-faint); letter-spacing: .1em; margin-bottom: 6px; text-transform: uppercase; }
-
-@media(max-width:540px){
-  .btn { font-size: .65rem; padding: 6px 9px; }
-  .generation-row { gap: 14px; }
-  .person-symbol { width: 40px; height: 40px; }
-  .person-name { font-size: .58rem; }
-}
-
-
-
-/* ══════════════════════════════════════
-   CUSTOM CROSS PANEL
-══════════════════════════════════════ */
-.btn-cc.active { color: var(--cc); border-color: var(--cc); background: rgba(167,139,250,.12); }
-
-.cc-panel {
-  display: none;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 10px;
-  padding: 16px 18px;
-  margin-bottom: 14px;
-  box-shadow: var(--shadow-sm);
-  animation: ccFadeIn .22s ease;
-}
-.cc-panel.open { display: block; }
-@keyframes ccFadeIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: none; } }
-
-.cc-panel-title {
-  font-family: 'IBM Plex Mono', monospace;
-  font-size: .55rem; letter-spacing: .1em; text-transform: uppercase;
-  color: #a78bfa; margin-bottom: 14px; display: flex; align-items: center; gap: 6px;
-}
-.cc-panel-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
-
-.cc-parents-row { display: flex; align-items: flex-start; gap: 10px; flex-wrap: wrap; }
-.cc-spouse-row { margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border); }
-.cc-spouse-row .cc-parent-label { margin-bottom: 7px; }
-.cc-parent-block { flex: 1; min-width: 140px; }
-.cc-parent-label {
-  font-family: 'IBM Plex Mono', monospace; font-size: .58rem;
-  color: var(--text-faint); letter-spacing: .07em; text-transform: uppercase;
-  margin-bottom: 7px; display: flex; align-items: center; gap: 5px;
-}
-.cc-sex-pill {
-  display: inline-flex; align-items: center; justify-content: center;
-  width: 22px; height: 22px; border-radius: 4px; border: 1px solid; flex-shrink: 0;
-}
-.cc-sex-pill svg { width: 16px; height: 16px; }
-.cc-sex-m { color: #67e8f9; border-color: #67e8f9; background: rgba(103,232,249,.1); }
-.cc-sex-f { color: #f9a8d4; border-color: #f9a8d4; background: rgba(249,168,212,.1); }
-
-.cc-mode-sel {
-  font-family: 'IBM Plex Mono', monospace; font-size: .62rem;
-  background: var(--surface); border: 1px solid var(--border2);
-  color: var(--text); border-radius: 5px; padding: 4px 7px; width: 100%;
-  margin-bottom: 8px; cursor: pointer; appearance: none; outline: none;
-}
-.cc-mode-sel:focus { border-color: #a78bfa; }
-
-.cc-gt-grid { display: flex; flex-wrap: wrap; gap: 5px; }
-.cc-gt-btn {
-  font-family: 'IBM Plex Mono', monospace; font-size: .62rem;
-  padding: 4px 9px; border-radius: 5px; cursor: pointer;
-  border: 1px solid var(--border2); background: var(--surface);
-  color: var(--text-dim); transition: all .13s ease;
-}
-.cc-gt-btn:hover { border-color: #a78bfa; color: #a78bfa; background: rgba(167,139,250,.1); }
-.cc-gt-btn.sel {
-  border-color: #a78bfa; color: #a78bfa;
-  background: rgba(167,139,250,.18); font-weight: 600;
-}
-
-.cc-cross-sym {
-  font-size: 1.3rem; color: var(--text-faint);
-  align-self: center; padding-top: 28px; flex-shrink: 0;
-}
-
-.cc-result-area {
-  margin-top: 14px; border-top: 1px solid var(--border); padding-top: 12px;
-}
-.cc-result-label {
-  font-family: 'IBM Plex Mono', monospace; font-size: .52rem;
-  letter-spacing: .1em; text-transform: uppercase;
-  color: var(--text-faint); margin-bottom: 9px;
-}
-.cc-punnett {
-  border-collapse: separate; border-spacing: 2px; margin-bottom: 10px;
-  font-family: 'IBM Plex Mono', monospace; font-size: .68rem;
-  width: fit-content;
-}
-.cc-punnett-cell {
-  min-width: 52px; height: 32px; padding: 0 8px; text-align: center; vertical-align: middle;
-  border-radius: 4px; border: 1px solid var(--border); background: var(--surface);
-  font-weight: 500; white-space: nowrap; font-size: .62rem;
-}
-.cc-punnett-cell.header {
-  background: var(--surface2); color: var(--text-faint);
-  font-size: .55rem; border-color: var(--border); font-weight: 600;
-}
-.cc-punnett-cell.affected { background: rgba(167,139,250,.22); border-color: #a78bfa; color: #a78bfa; }
-.cc-punnett-cell.carrier  { background: rgba(167,139,250,.09); border-color: rgba(167,139,250,.5); color: rgba(167,139,250,.9); }
-.cc-punnett-cell.unaffected { color: var(--text-dim); }
-
-.cc-prob-row { display: flex; align-items: center; gap: 7px; margin-bottom: 5px; }
-.cc-prob-bar-wrap { flex: 1; height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; }
-.cc-prob-bar { height: 100%; border-radius: 2px; background: #a78bfa; transition: width .6s ease; width: 0%; }
-.cc-prob-bar.carrier-bar { background: rgba(167,139,250,.55); }
-.cc-prob-bar.unaffected-bar { background: var(--text-faint); }
-.cc-prob-pct { font-family: 'IBM Plex Mono', monospace; font-size: .57rem; color: var(--text); width: 28px; text-align: right; }
-.cc-prob-lbl { font-size: .68rem; color: var(--text-dim); width: 140px; }
-.cc-hint { font-family: 'IBM Plex Sans', sans-serif; font-size: .68rem; color: var(--text-faint); margin-top: 8px; line-height: 1.5; }
-
-.cc-apply-btn {
-  margin-top: 12px; width: 100%; padding: 8px 14px;
-  font-family: 'IBM Plex Sans', sans-serif; font-size: .73rem; font-weight: 600;
-  background: rgba(167,139,250,.15); border: 1px solid #a78bfa; color: #a78bfa;
-  border-radius: 6px; cursor: pointer; transition: all .15s ease; letter-spacing: .01em;
-}
-
-
-
-
-
-
-
-/* Dark mode default: moon on LEFT (thumb at left) */
-
-/* Light mode: sun on RIGHT */
-
-
-</style>
 </head>
 <body>
 
 <div class="app">
-  <header>
-    <div class="title"><span style="-webkit-text-fill-color:initial;margin-right:8px;font-size:0.85em;">🧬</span>Heritrix: Pedigree Simulator</div>
-    <div class="subtitle">Mendelian Inheritance &nbsp;·&nbsp; Interactive Learning Tool</div>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-title"><div class="brand-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M7 3c0 6 10 6 10 12s-10 6-10 6"/><path d="M17 3c0 6-10 6-10 12s10 6 10 6"/><path d="M8.5 6.5h7M8.5 17.5h7M10 12h4"/></svg></div><h1>Heritrix</h1></div>
+      <p>Pedigree and Mendelian inheritance simulator</p>
+    </div>
+    <button class="icon-btn theme-btn" id="btn-theme" onclick="toggleTheme()" title="Light or dark theme (T)" aria-label="Toggle light or dark theme">
+      <svg class="i-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+      <svg class="i-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+    </button>
   </header>
 
-  <div class="controls-bar">
-    <button class="btn btn-ad"  id="btn-ad"  onclick="setMode('ad')">🌸 Auto. Dominant<span class="sh">Key: 1</span></button>
-    <button class="btn btn-ar"  id="btn-ar"  onclick="setMode('ar')">🟡 Auto. Recessive<span class="sh">Key: 2</span></button>
-    <button class="btn btn-xlr" id="btn-xlr" onclick="setMode('xlr')">🔵 X-Linked Rec.<span class="sh">Key: 3</span></button>
-    <button class="btn btn-xld" id="btn-xld" onclick="setMode('xld')">🟢 X-Linked Dom.<span class="sh">Key: 4</span></button>
-    <button class="btn btn-cc"   id="btn-cc"   onclick="toggleCustomCross()">✦ Custom Cross<span class="sh">Key: C</span></button>
-    <button class="btn btn-pause" id="btn-pause" onclick="togglePause()">⏸ Pause<span class="sh">Key: P</span></button>
-    <button class="btn btn-reset" onclick="resetChart()">⟳ Reset<span class="sh">Key: R</span></button>
+  <nav class="tabs" role="tablist" aria-label="Inheritance pattern">
+    <button class="tab" id="tab-ad"  style="--tc:var(--ad)"  onclick="setMode('ad')"  title="Key 1"><span class="dot"></span><span class="long">Autosomal dominant</span><span class="short">AD</span></button>
+    <button class="tab" id="tab-ar"  style="--tc:var(--ar)"  onclick="setMode('ar')"  title="Key 2"><span class="dot"></span><span class="long">Autosomal recessive</span><span class="short">AR</span></button>
+    <button class="tab" id="tab-xlr" style="--tc:var(--xlr)" onclick="setMode('xlr')" title="Key 3"><span class="dot"></span><span class="long">X-linked recessive</span><span class="short">XLR</span></button>
+    <button class="tab" id="tab-xld" style="--tc:var(--xld)" onclick="setMode('xld')" title="Key 4"><span class="dot"></span><span class="long">X-linked dominant</span><span class="short">XLD</span></button>
+    <button class="tab" id="tab-cc"  style="--tc:var(--cc)"  onclick="openCustom()"   title="Key C"><span class="dot"></span><span class="long">Custom cross</span><span class="short">Custom</span></button>
+  </nav>
 
-  </div>
-
-  <div class="speed-row">
-    <span class="slabel">SPEED</span>
-    <input type="range" id="speed-slider" min="0.25" max="3" step="0.25" value="1" oninput="onSpeedChange(this.value)">
-    <span class="sval" id="speed-val">1×</span>
-  </div>
-
-  <!-- CUSTOM CROSS PANEL -->
-  <div class="cc-panel" id="cc-panel">
-    <div class="cc-panel-title">✦ Custom Cross Builder</div>
-    <div class="cc-parents-row">
-      <!-- FATHER -->
-      <div class="cc-parent-block">
-        <div class="cc-parent-label">Father <span class="cc-sex-pill cc-sex-m"><svg viewBox="0 0 46 46" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="23" cy="24" r="10"/><line x1="30" y1="17" x2="38" y2="9"/><polyline points="32,9 38,9 38,15"/></svg></span></div>
-        <select class="cc-mode-sel" id="cc-mode-father" onchange="syncCrossModes('father')">
-          <option value="ad">Autosomal Dominant</option>
-          <option value="ar">Autosomal Recessive</option>
-          <option value="xlr">X-Linked Recessive</option>
-          <option value="xld">X-Linked Dominant</option>
-        </select>
-        <div class="cc-gt-grid" id="cc-gt-father"></div>
+  <main class="layout">
+    <section class="card chart-card" id="chart-card">
+      <div class="chart-head">
+        <div class="chart-title" id="chart-title"></div>
+        <div class="chart-tools">
+          <button class="icon-btn" id="btn-replay" onclick="replay()" title="Replay (R)" aria-label="Replay"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>
+          <button class="icon-btn" id="btn-pause" onclick="togglePause()" title="Pause (P)" aria-label="Pause"></button>
+          <button class="icon-btn speed" id="speed-val" onclick="cycleSpeed()" title="Animation speed">1×</button>
+        </div>
       </div>
-      <div class="cc-cross-sym">×</div>
-      <!-- MOTHER -->
-      <div class="cc-parent-block">
-        <div class="cc-parent-label">Mother <span class="cc-sex-pill cc-sex-f"><svg viewBox="0 0 46 46" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="23" cy="18" r="10"/><line x1="23" y1="28" x2="23" y2="39"/><line x1="17" y1="34" x2="29" y2="34"/></svg></span></div>
-        <select class="cc-mode-sel" id="cc-mode-mother" onchange="syncCrossModes('mother')">
-          <option value="ad">Autosomal Dominant</option>
-          <option value="ar">Autosomal Recessive</option>
-          <option value="xlr">X-Linked Recessive</option>
-          <option value="xld">X-Linked Dominant</option>
-        </select>
-        <div class="cc-gt-grid" id="cc-gt-mother"></div>
-      </div>
-    </div>
-
-    <!-- SPOUSE SELECTOR (CC-1 fix): user explicitly picks spouse genotype -->
-    <div class="cc-spouse-row" id="cc-spouse-row">
-      <div class="cc-parent-label">Spouse (Gen II) <span class="cc-sex-pill cc-sex-m"><svg viewBox="0 0 46 46" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="23" cy="24" r="10"/><line x1="30" y1="17" x2="38" y2="9"/><polyline points="32,9 38,9 38,15"/></svg></span></div>
-      <div class="cc-gt-grid" id="cc-gt-spouse"></div>
-    </div>
-
-    <!-- RESULTS -->
-    <div class="cc-result-area" id="cc-result-area" style="display:none">
-      <div class="cc-result-label">Gen I Cross — Punnett Square</div>
-      <div id="cc-punnett"></div>
-      <div class="cc-result-label" style="margin-top:10px">Gen I Offspring Probabilities</div>
-      <div id="cc-probs"></div>
-      <div class="cc-result-label" style="margin-top:10px">Gen III Probabilities (II-2 × Spouse) <span style="opacity:.5;font-size:.6rem">weighted avg</span></div>
-      <div id="cc-probs-gen3"></div>
-    <button class="cc-apply-btn" id="cc-apply-btn" onclick="applyCCToChart()">Apply to Pedigree Chart ↓</button>
-      <button class="cc-apply-btn" id="cc-reroll-btn" onclick="rerollCCChart()" style="display:none;margin-top:6px;background:rgba(167,139,250,.07);font-weight:400;font-size:.68rem;">🎲 Re-roll offspring (randomise again)</button>
-      <div class="cc-hint">Tap Re-roll to see a different random outcome each time.</div>
-    </div>
-  </div>
-
-
-  <div class="main-panel">
-    <!-- CHART -->
-    <div class="chart-card" id="chart-card">
+      <div class="chart-scroll">
       <div class="chart-inner" id="chart-inner">
         <svg id="pedigree-lines" xmlns="http://www.w3.org/2000/svg"></svg>
 
@@ -452,7 +57,7 @@ svg#pedigree-lines { position: absolute; top: 0; left: 0; width: 100%; height: 1
             <div class="gen-row-label" id="gen-row-label-i">GEN I</div>
             <svg class="person-symbol" id="p1_1" viewBox="0 0 46 46" onclick="inspectPerson('p1_1')" role="button" tabindex="0" aria-label="Inspect I-1 Grandfather">
               <rect class="sym-shape" x="3" y="3" width="40" height="40" rx="4" fill="#2a2a28" stroke="#4a4a46" stroke-width="2"/>
-              <polygon class="sym-carrier-fill" id="p1_1-carrier" points="3,43 43,3 43,43" fill="none"/>
+              <polygon class="sym-carrier-fill" id="p1_1-carrier" points="23,3 43,3 43,43 23,43" fill="none"/>
               <g class="sym-gender-icon"><circle cx="23" cy="24" r="7.5"/><line x1="28.3" y1="18.7" x2="35.5" y2="11.5"/><polyline points="30.5,11.5 35.5,11.5 35.5,16.5"/></g>
             </svg>
             <div class="person-name">Grandfather</div>
@@ -474,23 +79,23 @@ svg#pedigree-lines { position: absolute; top: 0; left: 0; width: 100%; height: 1
             <div class="gen-row-label" style="opacity:0">GEN II</div>
             <svg class="person-symbol" id="p2_1" viewBox="0 0 46 46" onclick="inspectPerson('p2_1')" role="button" tabindex="0" aria-label="Inspect II-1 Son">
               <rect class="sym-shape" x="3" y="3" width="40" height="40" rx="4" fill="#2a2a28" stroke="#4a4a46" stroke-width="2"/>
-              <polygon class="sym-carrier-fill" id="p2_1-carrier" points="3,43 43,3 43,43" fill="none"/>
+              <polygon class="sym-carrier-fill" id="p2_1-carrier" points="23,3 43,3 43,43 23,43" fill="none"/>
               <g class="sym-gender-icon"><circle cx="23" cy="24" r="7.5"/><line x1="28.3" y1="18.7" x2="35.5" y2="11.5"/><polyline points="30.5,11.5 35.5,11.5 35.5,16.5"/></g>
             </svg>
             <div class="person-name">Son</div>
           </div>
           <div class="person-wrap">
             <div class="gen-row-label" style="opacity:0">GEN II</div>
-            <svg class="person-symbol" id="p2_3" viewBox="0 0 46 46" onclick="inspectPerson('p2_3')" role="button" tabindex="0" aria-label="Inspect II-3 Son">
+            <svg class="person-symbol" id="p2_3" viewBox="0 0 46 46" onclick="inspectPerson('p2_3')" role="button" tabindex="0" aria-label="Inspect II-2 Son">
               <rect class="sym-shape" x="3" y="3" width="40" height="40" rx="4" fill="#2a2a28" stroke="#4a4a46" stroke-width="2"/>
-              <polygon class="sym-carrier-fill" id="p2_3-carrier" points="3,43 43,3 43,43" fill="none"/>
+              <polygon class="sym-carrier-fill" id="p2_3-carrier" points="23,3 43,3 43,43 23,43" fill="none"/>
               <g class="sym-gender-icon"><circle cx="23" cy="24" r="7.5"/><line x1="28.3" y1="18.7" x2="35.5" y2="11.5"/><polyline points="30.5,11.5 35.5,11.5 35.5,16.5"/></g>
             </svg>
             <div class="person-name">Son</div>
           </div>
           <div class="person-wrap">
             <div class="gen-row-label" style="opacity:0">GEN II</div>
-            <svg class="person-symbol" id="p2_4" viewBox="0 0 46 46" onclick="inspectPerson('p2_4')" role="button" tabindex="0" aria-label="Inspect II-4 Daughter">
+            <svg class="person-symbol" id="p2_4" viewBox="0 0 46 46" onclick="inspectPerson('p2_4')" role="button" tabindex="0" aria-label="Inspect II-3 Daughter">
               <circle class="sym-shape" cx="23" cy="23" r="19" fill="#2a2a28" stroke="#4a4a46" stroke-width="2"/>
               <path class="sym-carrier-fill" id="p2_4-carrier" d="M23,4 A19,19 0 0,1 23,42 L23,23 Z" fill="none"/>
               <g class="sym-gender-icon"><circle cx="23" cy="18" r="7.5"/><line x1="23" y1="25.5" x2="23" y2="35"/><line x1="18" y1="30.5" x2="28" y2="30.5"/></g>
@@ -499,7 +104,7 @@ svg#pedigree-lines { position: absolute; top: 0; left: 0; width: 100%; height: 1
           </div>
           <div class="person-wrap">
             <div class="gen-row-label" style="opacity:0">GEN II</div>
-            <svg class="person-symbol" id="p2_2" viewBox="0 0 46 46" onclick="inspectPerson('p2_2')" role="button" tabindex="0" aria-label="Inspect II-2 Daughter">
+            <svg class="person-symbol" id="p2_2" viewBox="0 0 46 46" onclick="inspectPerson('p2_2')" role="button" tabindex="0" aria-label="Inspect II-4 Daughter">
               <circle class="sym-shape" cx="23" cy="23" r="19" fill="#2a2a28" stroke="#4a4a46" stroke-width="2"/>
               <path class="sym-carrier-fill" id="p2_2-carrier" d="M23,4 A19,19 0 0,1 23,42 L23,23 Z" fill="none"/>
               <g class="sym-gender-icon"><circle cx="23" cy="18" r="7.5"/><line x1="23" y1="25.5" x2="23" y2="35"/><line x1="18" y1="30.5" x2="28" y2="30.5"/></g>
@@ -508,9 +113,9 @@ svg#pedigree-lines { position: absolute; top: 0; left: 0; width: 100%; height: 1
           </div>
           <div class="person-wrap" style="margin-left:12px;">
             <div class="gen-row-label" style="opacity:0">GEN II</div>
-            <svg class="person-symbol" id="spouse" viewBox="0 0 46 46" onclick="inspectPerson('spouse')" role="button" tabindex="0" aria-label="Inspect Spouse">
+            <svg class="person-symbol" id="spouse" viewBox="0 0 46 46" onclick="inspectPerson('spouse')" role="button" tabindex="0" aria-label="Inspect II-5 Spouse">
               <rect class="sym-shape" x="3" y="3" width="40" height="40" rx="4" fill="#2a2a28" stroke="#4a4a46" stroke-width="2"/>
-              <polygon class="sym-carrier-fill" id="spouse-carrier" points="3,43 43,3 43,43" fill="none"/>
+              <polygon class="sym-carrier-fill" id="spouse-carrier" points="23,3 43,3 43,43 23,43" fill="none"/>
               <g class="sym-gender-icon"><circle cx="23" cy="24" r="7.5"/><line x1="28.3" y1="18.7" x2="35.5" y2="11.5"/><polyline points="30.5,11.5 35.5,11.5 35.5,16.5"/></g>
             </svg>
             <div class="person-name">Spouse</div>
@@ -523,23 +128,23 @@ svg#pedigree-lines { position: absolute; top: 0; left: 0; width: 100%; height: 1
             <div class="gen-row-label" style="opacity:0">GEN III</div>
             <svg class="person-symbol" id="p3_1" viewBox="0 0 46 46" onclick="inspectPerson('p3_1')" role="button" tabindex="0" aria-label="Inspect III-1 Grandson">
               <rect class="sym-shape" x="3" y="3" width="40" height="40" rx="4" fill="#2a2a28" stroke="#4a4a46" stroke-width="2"/>
-              <polygon class="sym-carrier-fill" id="p3_1-carrier" points="3,43 43,3 43,43" fill="none"/>
+              <polygon class="sym-carrier-fill" id="p3_1-carrier" points="23,3 43,3 43,43 23,43" fill="none"/>
               <g class="sym-gender-icon"><circle cx="23" cy="24" r="7.5"/><line x1="28.3" y1="18.7" x2="35.5" y2="11.5"/><polyline points="30.5,11.5 35.5,11.5 35.5,16.5"/></g>
             </svg>
             <div class="person-name">Grandson</div>
           </div>
           <div class="person-wrap">
             <div class="gen-row-label" style="opacity:0">GEN III</div>
-            <svg class="person-symbol" id="p3_3" viewBox="0 0 46 46" onclick="inspectPerson('p3_3')" role="button" tabindex="0" aria-label="Inspect III-3 Grandson">
+            <svg class="person-symbol" id="p3_3" viewBox="0 0 46 46" onclick="inspectPerson('p3_3')" role="button" tabindex="0" aria-label="Inspect III-2 Grandson">
               <rect class="sym-shape" x="3" y="3" width="40" height="40" rx="4" fill="#2a2a28" stroke="#4a4a46" stroke-width="2"/>
-              <polygon class="sym-carrier-fill" id="p3_3-carrier" points="3,43 43,3 43,43" fill="none"/>
+              <polygon class="sym-carrier-fill" id="p3_3-carrier" points="23,3 43,3 43,43 23,43" fill="none"/>
               <g class="sym-gender-icon"><circle cx="23" cy="24" r="7.5"/><line x1="28.3" y1="18.7" x2="35.5" y2="11.5"/><polyline points="30.5,11.5 35.5,11.5 35.5,16.5"/></g>
             </svg>
             <div class="person-name">Grandson</div>
           </div>
           <div class="person-wrap">
             <div class="gen-row-label" style="opacity:0">GEN III</div>
-            <svg class="person-symbol" id="p3_2" viewBox="0 0 46 46" onclick="inspectPerson('p3_2')" role="button" tabindex="0" aria-label="Inspect III-2 Granddaughter">
+            <svg class="person-symbol" id="p3_2" viewBox="0 0 46 46" onclick="inspectPerson('p3_2')" role="button" tabindex="0" aria-label="Inspect III-3 Granddaughter">
               <circle class="sym-shape" cx="23" cy="23" r="19" fill="#2a2a28" stroke="#4a4a46" stroke-width="2"/>
               <path class="sym-carrier-fill" id="p3_2-carrier" d="M23,4 A19,19 0 0,1 23,42 L23,23 Z" fill="none"/>
               <g class="sym-gender-icon"><circle cx="23" cy="18" r="7.5"/><line x1="23" y1="25.5" x2="23" y2="35"/><line x1="18" y1="30.5" x2="28" y2="30.5"/></g>
@@ -557,53 +162,62 @@ svg#pedigree-lines { position: absolute; top: 0; left: 0; width: 100%; height: 1
           </div>
         </div>
       </div>
-    </div>
-
-    <!-- INFO PANEL -->
-    <div class="info-card">
-      <div class="info-title">Mode Info</div>
-      <div class="mode-badge" id="mode-badge">
-        <span class="mode-icon" id="mode-icon">🔵</span>
-        <span class="mode-name" id="mode-name" style="color:var(--xlr)">X-Linked<br>Recessive</span>
       </div>
-      <div class="mode-desc" id="mode-desc">Males express the trait if they inherit the allele. Females are typically carriers. No male-to-male transmission.</div>
+      <div class="legend-row">
+        <span class="lg"><svg viewBox="0 0 20 20"><rect class="s-un" x="2" y="2" width="16" height="16" rx="3" stroke-width="1.5"/></svg>Unaffected</span>
+        <span class="lg"><svg viewBox="0 0 20 20"><rect class="s-af" x="2" y="2" width="16" height="16" rx="3" stroke-width="1.5"/></svg>Affected</span>
+        <span class="lg" id="leg-carrier"><svg viewBox="0 0 20 20"><circle class="s-ca" cx="10" cy="10" r="8" stroke-width="1.5"/><path class="s-cf" d="M10,2 A8,8 0 0,1 10,18 Z"/></svg>Carrier</span>
+        <span class="hint">Tap a symbol for its genotype</span>
+      </div>
+    </section>
 
+    <aside class="card side" id="side-info">
+      <div class="kicker">Inheritance pattern</div>
+      <h2 id="side-title"></h2>
+      <p class="side-desc" id="side-desc"></p>
       <div class="prob-panel">
-        <div class="prob-title">OFFSPRING PROBABILITY · II-2 × Spouse</div>
+        <div class="prob-title">Children of II-4 × II-5</div>
         <div class="prob-mating" id="prob-mating"></div>
         <div id="prob-bars"></div>
       </div>
+      <p class="side-hint">Square = male, circle = female. Half-shaded = carrier (one recessive allele, unaffected).</p>
+    </aside>
 
-      <div class="legend">
-        <div class="legend-title">Legend</div>
-        <div class="legend-items">
-          <div class="legend-item">
-            <svg class="legend-sym" viewBox="0 0 20 20"><rect x="1" y="1" width="18" height="18" rx="3" fill="#2a2a28" stroke="#4a4a46" stroke-width="1.5"/></svg>Unaffected Male
-          </div>
-          <div class="legend-item">
-            <svg class="legend-sym" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8" fill="#2a2a28" stroke="#4a4a46" stroke-width="1.5"/></svg>Unaffected Female
-          </div>
-          <div class="legend-item" id="leg-affected">
-            <svg class="legend-sym" viewBox="0 0 20 20" id="leg-aff-svg"><rect x="1" y="1" width="18" height="18" rx="3" fill="#67e8f9" stroke="#67e8f9" stroke-width="1.5"/></svg>Affected
-          </div>
-          <div class="legend-item" id="leg-carrier">
-            <svg class="legend-sym" viewBox="0 0 20 20" id="leg-car-svg">
-              <circle cx="10" cy="10" r="8" fill="var(--surface)" stroke="#67e8f9" stroke-width="1.5"/>
-              <path d="M10,2 A8,8 0 0,1 18,10 L10,10 Z" fill="#67e8f9" opacity="0.7"/>
-            </svg>Carrier
-          </div>
-        </div>
+    <aside class="card side" id="side-custom" hidden>
+      <div class="cc-top">
+        <h2>Custom cross</h2>
+        <select class="cc-mode-sel" id="cc-mode" onchange="onCCModeChange()" aria-label="Inheritance pattern">
+          <option value="ad">Autosomal dominant</option>
+          <option value="ar">Autosomal recessive</option>
+          <option value="xlr">X-linked recessive</option>
+          <option value="xld">X-linked dominant</option>
+        </select>
       </div>
-
-      <div class="kbd-hints">
-        <div class="kbd-item"><span class="kbd">1–4</span> Mode</div>
-        <div class="kbd-item"><span class="kbd">R</span> Reset</div>
-        <div class="kbd-item"><span class="kbd">P</span> Pause</div>
-        <div class="kbd-item"><span class="kbd">C</span> Custom</div>
-        <div class="click-hint">💡 Click any symbol to inspect genotype &amp; explanation</div>
+      <div class="cc-step">
+        <div class="cc-step-lbl"><b>Gen I · Parents</b></div>
+        <span class="cc-who">Father I-1</span><div class="cc-gt-grid" id="cc-gt-father"></div>
+        <span class="cc-who">Mother I-2</span><div class="cc-gt-grid" id="cc-gt-mother"></div>
       </div>
-    </div>
-  </div>
+      <div class="cc-step">
+        <div class="cc-step-lbl"><b>Gen II · Children</b><span>tap to change</span></div>
+        <div class="cc-slots" id="cc-slots-2"></div>
+        <span class="cc-who">Spouse of II-4 (II-5)</span><div class="cc-gt-grid" id="cc-gt-spouse"></div>
+      </div>
+      <div class="cc-step">
+        <div class="cc-step-lbl"><b>Gen III · Grandchildren</b><span>tap to change</span></div>
+        <div class="cc-slots" id="cc-slots-3"></div>
+      </div>
+      <div class="cc-foot">
+        <div class="cc-hint" id="cc-hint"></div>
+        <button class="ghost-btn" id="cc-reroll-btn" onclick="rerollCCChart()" disabled><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="4"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>Random</button>
+      </div>
+      <details class="cc-details">
+        <summary>Punnett squares and probabilities</summary>
+        <div class="cc-block"><div class="cc-result-label">Gen I cross · Father × Mother</div><div id="cc-punnett"></div><div id="cc-probs"></div></div>
+        <div class="cc-block"><div class="cc-result-label">Gen III cross · II-4 × Spouse</div><div id="cc-punnett3"></div><div id="cc-probs-gen3"></div></div>
+      </details>
+    </aside>
+  </main>
 </div>
 
 <!-- HOVER TOOLTIP -->
@@ -636,1090 +250,6 @@ svg#pedigree-lines { position: absolute; top: 0; left: 0; width: 100%; height: 1
   </div>
 </div>
 
-<script>
-// ═══════════════════════════════════════════
-// DATA
-// ═══════════════════════════════════════════
-const MODES = {
-  ad: {
-    color:'#e879f9', icon:'🌸', name:'Autosomal\nDominant',
-    desc:'Only one copy of the mutated gene is needed. Appears in every generation. Males and females are equally affected.',
-    affected:['p1_2','p2_2','p2_3','p3_1','p3_3'], carriers:[],
-    probMating:'Aa (affected mother) × aa (unaffected father)',
-    probs:[{lbl:'Affected (Aa)',pct:50,type:'affected'},{lbl:'Unaffected (aa)',pct:50,type:'unaffected'}],
-    genotypes:{
-      p1_1:{gt:'aa',status:'Unaffected',exp:'Grandfather (Gen I) carries no dominant allele. He is homozygous recessive (aa) and does not express the trait.'},
-      p1_2:{gt:'Aa',status:'Affected',exp:'Grandmother (Gen I) carries one dominant allele (A). In autosomal dominant inheritance, one copy is sufficient to express the trait — she is affected.'},
-      p2_1:{gt:'aa',status:'Unaffected',exp:'Son 1 (Gen II) did not inherit the dominant A allele from his affected mother. He is homozygous recessive (aa) and unaffected.'},
-      p2_3:{gt:'Aa',status:'Affected',exp:'Son 2 (Gen II) inherited the dominant A allele from Grandmother and is therefore affected (Aa).'},
-      p2_2:{gt:'Aa',status:'Affected',exp:'Daughter 1 (Gen II) inherited the dominant A allele from her affected mother Grandmother. One copy is enough to express the trait — she is affected.'},
-      p2_4:{gt:'aa',status:'Unaffected',exp:'Daughter 2 (Gen II) did not inherit the dominant A allele from her affected mother — she is homozygous recessive (aa) and unaffected.'},
-      spouse:{gt:'aa',status:'Unaffected',exp:'The Spouse carries no dominant allele (aa) and is phenotypically normal.'},
-      p3_1:{gt:'Aa',status:'Affected',exp:'Grandson 1 (Gen III) inherited the dominant A allele from his affected mother Daughter 1. One copy is sufficient — he expresses the trait.'},
-      p3_3:{gt:'Aa',status:'Affected',exp:'Grandson 2 (Gen III) also inherited the dominant A allele from his mother and is affected (Aa).'},
-      p3_2:{gt:'aa',status:'Unaffected',exp:'Granddaughter 1 (Gen III) did not inherit the dominant allele from her affected mother. She is homozygous recessive (aa) and unaffected.'},
-      p3_4:{gt:'aa',status:'Unaffected',exp:'Granddaughter 2 (Gen III) also did not inherit the dominant allele — she is unaffected (aa).'}
-    }
-  },
-  ar: {
-    color:'#fbbf24', icon:'🟡', name:'Autosomal\nRecessive',
-    desc:'Two copies of the mutated gene are required. The trait may skip generations. Parents are often carriers.',
-    affected:['p2_1'], carriers:['p1_1','p1_2','p2_2','p2_4','p3_1','p3_3'],
-    probMating:'Aa (carrier mother) × Aa (carrier father)',
-    probs:[{lbl:'Affected (aa)',pct:25,type:'affected'},{lbl:'Carrier (Aa)',pct:50,type:'carrier'},{lbl:'Unaffected (AA)',pct:25,type:'unaffected'}],
-    genotypes:{
-      p1_1:{gt:'Aa',status:'Carrier',exp:'Grandfather (Gen I) carries one recessive allele (a) silently. He and Grandmother are both carriers, giving their children a 25% chance of being affected.'},
-      p1_2:{gt:'Aa',status:'Carrier',exp:'Grandmother (Gen I) is also a carrier (Aa). Both Gen I parents are carriers — phenotypically normal but each able to pass the recessive allele to offspring.'},
-      p2_1:{gt:'aa',status:'Affected',exp:'Son 1 (Gen II) inherited one recessive allele from each carrier parent, giving him two copies (aa). He is the only affected individual in Generation II.'},
-      p2_3:{gt:'AA',status:'Unaffected',exp:'Son 2 (Gen II) did not inherit any recessive allele. He is homozygous dominant (AA) and neither affected nor a carrier.'},
-      p2_2:{gt:'Aa',status:'Carrier',exp:'Daughter 1 (Gen II) inherited one recessive allele from her carrier parents. She is a carrier (Aa) — phenotypically normal but able to pass the allele on.'},
-      p2_4:{gt:'Aa',status:'Carrier',exp:'Daughter 2 (Gen II) is also a carrier (Aa), having inherited one recessive allele from the carrier parents.'},
-      spouse:{gt:'AA',status:'Unaffected',exp:'The Spouse is homozygous dominant (AA) with no recessive alleles — unaffected and not a carrier.'},
-      p3_1:{gt:'Aa',status:'Carrier',exp:'Grandson 1 (Gen III) received one recessive allele from his carrier mother Daughter 1 and none from the unaffected Spouse. He is a carrier (Aa) but not affected.'},
-      p3_3:{gt:'Aa',status:'Carrier',exp:'Grandson 2 (Gen III) is also a carrier (Aa) — one recessive allele from his mother, none from the Spouse.'},
-      p3_2:{gt:'AA',status:'Unaffected',exp:'Granddaughter 1 (Gen III) received no recessive alleles from either parent. She is homozygous dominant (AA) and fully unaffected.'},
-      p3_4:{gt:'AA',status:'Unaffected',exp:'Granddaughter 2 (Gen III) is also homozygous dominant (AA) — unaffected with no recessive alleles.'}
-    }
-  },
-  xlr: {
-    color:'#67e8f9', icon:'🔵', name:'X-Linked\nRecessive',
-    desc:'Males express the trait if they inherit the allele. Females are typically carriers. No male-to-male transmission.',
-    affected:['p1_1','p2_3','p3_1'], carriers:['p1_2','p2_2','p2_4','p3_2'],
-    probMating:'XAXa (carrier daughter II-2) × XAY (unaffected spouse) → Gen III',
-    probs:[{lbl:'Sons affected (XaY)',pct:25,type:'affected'},{lbl:'Sons unaffected (XAY)',pct:25,type:'unaffected'},{lbl:'Daughters carrier (XAXa)',pct:25,type:'carrier'},{lbl:'Daughters normal (XAXA)',pct:25,type:'unaffected'}],
-    genotypes:{
-      p1_1:{gt:'XaY',status:'Affected',exp:'Grandfather (Gen I) has only one X chromosome, which carries the recessive allele (X<sup>a</sup>). Males need just one copy to be affected — he expresses the trait.'},
-      p1_2:{gt:'XAXa',status:'Carrier',exp:'Grandmother (Gen I) has a normal X (X<sup>A</sup>) and a recessive X (X<sup>a</sup>). The dominant allele masks the condition, so she is a phenotypically normal carrier.'},
-      p2_1:{gt:'XAY',status:'Unaffected',exp:'Son 1 (Gen II) inherited the normal X<sup>A</sup> from his carrier mother and a Y from his affected father. He is unaffected — fathers cannot pass X to sons.'},
-      p2_3:{gt:'XaY',status:'Affected',exp:'Son 2 (Gen II) inherited the recessive X<sup>a</sup> from his carrier mother and a Y from his father. With only one X chromosome he expresses the trait — he is affected.'},
-      p2_2:{gt:'XAXa',status:'Carrier',exp:'Daughter 1 (Gen II) received the recessive X<sup>a</sup> from her affected father (his only X goes to all daughters) and a normal X<sup>A</sup> from her mother. She is a carrier.'},
-      p2_4:{gt:'XAXa',status:'Carrier',exp:'Daughter 2 (Gen II) also received the recessive X<sup>a</sup> from her affected father (X<sup>a</sup>Y — all daughters inherit his only X) and a normal X<sup>A</sup> from her carrier mother. She is a carrier.'},
-      spouse:{gt:'XAY',status:'Unaffected',exp:'The Spouse has a normal X chromosome (X<sup>A</sup>Y) and carries no recessive allele — he is unaffected.'},
-      p3_1:{gt:'XaY',status:'Affected',exp:'Grandson 1 (Gen III) inherited the recessive X<sup>a</sup> from his carrier mother Daughter 1, and a Y from the Spouse. With only one X chromosome, he expresses the trait.'},
-      p3_3:{gt:'XAY',status:'Unaffected',exp:'Grandson 2 (Gen III) inherited the normal X<sup>A</sup> from his carrier mother Daughter 1 and a Y from the Spouse — he is unaffected.'},
-      p3_2:{gt:'XAXa',status:'Carrier',exp:'Granddaughter 1 (Gen III) inherited the recessive X<sup>a</sup> from her carrier mother Daughter 1 and a normal X<sup>A</sup> from the Spouse. She is a carrier like her mother.'},
-      p3_4:{gt:'XAXA',status:'Unaffected',exp:'Granddaughter 2 (Gen III) inherited a normal X<sup>A</sup> from the Spouse and a normal X<sup>A</sup> from her carrier mother — she is homozygous normal (X<sup>A</sup>X<sup>A</sup>) and unaffected.'}
-    }
-  },
-  xld: {
-    color:'#4ade80', icon:'🟢', name:'X-Linked\nDominant',
-    desc:'One copy of the dominant X allele is enough to cause the trait in both sexes. Affected mothers pass it to 50% of sons and daughters. No male-to-male transmission.',
-    affected:['p1_1','p2_2','p2_4','p3_3','p3_4'], carriers:[],
-    probMating:'XAXa (affected daughter II-2) × XaY (unaffected spouse) → Gen III',
-    probs:[{lbl:'Daughters affected (XAXa)',pct:25,type:'affected'},{lbl:'Daughters unaffected (XaXa)',pct:25,type:'unaffected'},{lbl:'Sons affected (XAY)',pct:25,type:'affected'},{lbl:'Sons unaffected (XaY)',pct:25,type:'unaffected'}],
-    genotypes:{
-      p1_1:{gt:'XAY',status:'Affected',exp:'Grandfather (Gen I) carries the dominant allele on his single X chromosome (X<sup>A</sup>Y). In X-linked dominant inheritance, one copy in males is sufficient — he is affected.'},
-      p1_2:{gt:'XaXa',status:'Unaffected',exp:'Grandmother (Gen I) has two normal X chromosomes (X<sup>a</sup>X<sup>a</sup>) and does not carry the dominant allele — she is unaffected.'},
-      p2_1:{gt:'XaY',status:'Unaffected',exp:'Son 1 (Gen II) inherited a Y from his affected father (not the X), and a normal X<sup>a</sup> from his mother. He is unaffected — fathers do not pass X to sons.'},
-      p2_3:{gt:'XaY',status:'Unaffected',exp:'Son 2 (Gen II) also inherited a Y from his affected father (not the X) and a normal X<sup>a</sup> from his mother — he is unaffected. Fathers in XLD cannot pass X to sons.'},
-      p2_2:{gt:'XAXa',status:'Affected',exp:'Daughter 1 (Gen II) received the dominant X<sup>A</sup> from her affected father Grandfather. All daughters of an affected father must inherit his X, so she is affected.'},
-      p2_4:{gt:'XAXa',status:'Affected',exp:'Daughter 2 (Gen II) also received the dominant X<sup>A</sup> from her affected father — all daughters of an affected XLD father are affected.'},
-      spouse:{gt:'XaY',status:'Unaffected',exp:'The Spouse is unaffected with a normal X chromosome (X<sup>a</sup>Y) — he carries no dominant allele.'},
-      p3_1:{gt:'XaY',status:'Unaffected',exp:'Grandson 1 (Gen III) inherited a Y from the Spouse and the normal X<sup>a</sup> from his affected mother Daughter 1 (50% chance). He is unaffected.'},
-      p3_3:{gt:'XAY',status:'Affected',exp:'Grandson 2 (Gen III) inherited a Y from the Spouse and the dominant X<sup>A</sup> from his affected mother Daughter 1 (50% chance). He expresses the trait.'},
-      p3_2:{gt:'XaXa',status:'Unaffected',exp:'Granddaughter 1 (Gen III) inherited X<sup>a</sup> from the Spouse and the normal X<sup>a</sup> from her affected mother (50% chance) — she is homozygous normal and unaffected.'},
-      p3_4:{gt:'XAXa',status:'Affected',exp:'Granddaughter 2 (Gen III) inherited X<sup>a</sup> from the Spouse and the dominant X<sup>A</sup> from her affected mother (50% chance) — she expresses the trait.'}
-    }
-  }
-};
-
-const PERSON_META = {
-  p1_1:{label:'1',  name:'Grandfather',   sex:'Male'},
-  p1_2:{label:'2',  name:'Grandmother',   sex:'Female'},
-  p2_1:{label:'1',  name:'Son',           sex:'Male'},
-  p2_3:{label:'3',  name:'Son',           sex:'Male'},
-  p2_2:{label:'2',  name:'Daughter',      sex:'Female'},
-  p2_4:{label:'4',  name:'Daughter',      sex:'Female'},
-  spouse:{label:'Sp', name:'Spouse',      sex:'Male'},
-  p3_1:{label:'1',  name:'Grandson',      sex:'Male'},
-  p3_3:{label:'3',  name:'Grandson',      sex:'Male'},
-  p3_2:{label:'2',  name:'Granddaughter', sex:'Female'},
-  p3_4:{label:'4',  name:'Granddaughter', sex:'Female'},
-};
-
-
-
-
-// ═══════════════════════════════════════════
-// GENOTYPE FORMATTING  — superscript display
-// ═══════════════════════════════════════════
-// Converts plain gt strings → HTML with <sup> for X-linked alleles.
-// Rules:
-//   XA  → X<sup>A</sup>    (XLD dominant)
-//   XA  → X<sup>a</sup>    (XLD/XLR normal)
-//   Xa  → X<sup>a</sup>    (XLR recessive — render as lowercase a in sup)
-//   AA, Aa, aa → kept as-is (autosomal, already readable)
-//   Y   → Y
-function formatGT(gt) {
-  if (!gt) return '';
-  // Replace X followed by allele letter(s) with superscript version
-  // Handles: XA, XA, Xa (U+1D43)
-  return gt
-    .replace(/X([Aa])/g, (_, allele) => `X<sup>${allele}</sup>`);
-}
-let currentMode=null, lastRealMode='xlr', timers=[], pulseFrames=new Set(), speedMult=1, isPaused=false;
-
-// ═══════════════════════════════════════════
-// TIMERS
-// ═══════════════════════════════════════════
-let pausedQueue=[];
-function later(fn,ms){ const id=setTimeout(()=>{ if(!isPaused){fn();}else{pausedQueue.push(fn);} }, Math.round(ms/speedMult)); timers.push(id); return id; }
-function clearAllTimers(){
-  timers.forEach(clearTimeout); timers=[]; pausedQueue=[]; isPaused=false;
-  pulseFrames.forEach(cancelAnimationFrame); pulseFrames=new Set();
-  const svg=document.getElementById('pedigree-lines');
-  if(svg) svg.querySelectorAll('circle').forEach(c=>c.remove());
-}
-
-// ═══════════════════════════════════════════
-// SPEED / PAUSE / STEP
-// ═══════════════════════════════════════════
-function onSpeedChange(v){ speedMult=parseFloat(v); document.getElementById('speed-val').textContent=speedMult+'×'; }
-
-function togglePause(){
-  isPaused=!isPaused;
-  const btn=document.getElementById('btn-pause');
-  btn.innerHTML=(isPaused?'▶ Resume':'⏸ Pause')+'<span class="sh">Key: P</span>';
-  if(!isPaused){
-    const queue=[...pausedQueue]; pausedQueue=[];
-    queue.forEach(fn=>fn());
-  }
-}
-
-
-
-
-
-// ═══════════════════════════════════════════
-// GEN LABEL GLOW
-// ═══════════════════════════════════════════
-function glowGenLabel(gen){
-  ['i','ii','iii'].forEach(g=>{
-    const el=document.getElementById('gen-label-'+g); if(!el)return;
-    el.classList.remove('glow'); el.style.removeProperty('--gc');
-    el.style.color='var(--text-dim)';
-  });
-  const el=document.getElementById('gen-label-'+gen);
-  if(el&&currentMode){ el.style.setProperty('--gc',MODES[currentMode].color); el.classList.add('glow'); el.style.color=MODES[currentMode].color; }
-}
-function resetGenLabels(){
-  ['i','ii','iii'].forEach(g=>{ const el=document.getElementById('gen-label-'+g); if(el){el.classList.remove('glow');el.style.removeProperty('--gc');el.style.color='var(--text-dim)';} });
-}
-
-// ═══════════════════════════════════════════
-// SVG LINES — coordinate geometry
-// ═══════════════════════════════════════════
-//
-// We measure symbol positions with getBoundingClientRect(), which is the only
-// reliable source of truth for a flex layout with justify-content:center,
-// padding, and a spouse margin-left.
-//
-// Timing fix: coordinates are only ever read inside scheduleLayout(), which
-// uses setTimeout(0) → rAF. The setTimeout(0) flushes any pending style/layout
-// work off the JS task queue; the rAF then fires after the browser's next
-// full layout+paint pass. This two-step is reliable on all Android WebViews
-// including Samsung Browser and in-app browsers, where a bare rAF or
-// document.fonts.ready can still return stale box sizes.
-
-function centerOf(el){
-  const ci=document.getElementById('chart-inner');
-  const cr=ci.getBoundingClientRect(), r=el.getBoundingClientRect();
-  return {x:r.left-cr.left+r.width/2, y:r.top-cr.top+r.height/2};
-}
-
-// Single entry-point for all layout reads. Always call this instead of
-// calling drawConnections/alignGenLabels directly.
-function scheduleLayout(then) {
-  // setTimeout(0): yields to the browser so any pending layout is flushed
-  setTimeout(() => {
-    // rAF: fires after the next full layout+paint pass
-    requestAnimationFrame(() => {
-      drawConnections();
-      alignGenLabels();
-      if (then) then();
-    });
-  }, 0);
-}
-
-function createLine(id,x1,y1,x2,y2,color,sw){
-  const svg=document.getElementById('pedigree-lines');
-  let l=document.getElementById(id);
-  if(!l){l=document.createElementNS('http://www.w3.org/2000/svg','line');l.setAttribute('id',id);svg.appendChild(l);}
-  l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);
-  l.setAttribute('stroke',color||'var(--line-default)');l.setAttribute('stroke-width',sw||2);l.setAttribute('stroke-linecap','round');
-  l.style.strokeDasharray='';l.style.strokeDashoffset='';l.style.transition='';
-  return l;
-}
-
-function lineLen(l){
-  const dx=parseFloat(l.getAttribute('x2'))-parseFloat(l.getAttribute('x1'));
-  const dy=parseFloat(l.getAttribute('y2'))-parseFloat(l.getAttribute('y1'));
-  return Math.sqrt(dx*dx+dy*dy);
-}
-
-function animateLine(line,dur){
-  const len=lineLen(line), ms=Math.round(dur/speedMult);
-  line.style.strokeDasharray=len; line.style.strokeDashoffset=len;
-  line.getBoundingClientRect();
-  line.style.transition=`stroke-dashoffset ${ms}ms ease`;
-  line.style.strokeDashoffset=0;
-  spawnPulse(line,ms);
-}
-
-function spawnPulse(line,dur){
-  const svg=document.getElementById('pedigree-lines');
-  const x1=parseFloat(line.getAttribute('x1')),y1=parseFloat(line.getAttribute('y1'));
-  const x2=parseFloat(line.getAttribute('x2')),y2=parseFloat(line.getAttribute('y2'));
-  const color=line.getAttribute('stroke');
-  const c=document.createElementNS('http://www.w3.org/2000/svg','circle');
-  c.setAttribute('r',4);c.setAttribute('fill',color);c.setAttribute('cx',x1);c.setAttribute('cy',y1);
-  c.style.filter=`drop-shadow(0 0 5px ${color})`;svg.appendChild(c);
-  const t0=performance.now();
-  let rafId;
-  function step(now){
-    const t=Math.min((now-t0)/dur,1);
-    c.setAttribute('cx',x1+(x2-x1)*t);c.setAttribute('cy',y1+(y2-y1)*t);
-    if(t<1){ rafId=requestAnimationFrame(step); pulseFrames.add(rafId); }
-    else { c.remove(); pulseFrames.delete(rafId); }
-  }
-  rafId=requestAnimationFrame(step);
-  pulseFrames.add(rafId);
-}
-
-function alignGenLabels(){
-  const ci = document.getElementById('chart-inner');
-  if(!ci) return;
-  const cr = ci.getBoundingClientRect();
-  const anchors = { i: 'p1_1', ii: 'p2_1', iii: 'p3_1' };
-  ['i','ii','iii'].forEach(gen => {
-    const lbl = document.getElementById('gen-label-' + gen);
-    const sym = document.getElementById(anchors[gen]);
-    if(!lbl || !sym) return;
-    const sr = sym.getBoundingClientRect();
-    lbl.style.top = (sr.top - cr.top + sr.height / 2) + 'px';
-  });
-}
-
-function drawConnections(){
-  const ids=['p1_1','p1_2','p2_1','p2_3','p2_2','p2_4','spouse','p3_1','p3_3','p3_2','p3_4'];
-  const E={}, C={};
-  ids.forEach(id=>{ E[id]=document.getElementById(id); });
-  if(!E.p1_1 || !E.p3_4) return;
-  ids.forEach(id=>{ if(E[id]) C[id]=centerOf(E[id]); });
-  const d='var(--line-default)', sw=2;
-
-  createLine('line-i-marriage', C.p1_1.x, C.p1_1.y, C.p1_2.x, C.p1_2.y, d, sw);
-
-  const mIx      = (C.p1_1.x + C.p1_2.x) / 2;
-  const sibIy    = C.p2_1.y - 28;
-  const sibIMidx = (C.p2_1.x + C.p2_2.x) / 2;
-  const elbowIy  = C.p1_1.y + (sibIy - C.p1_1.y) / 2;
-  createLine('line-i-descent-v',  mIx,      C.p1_1.y, mIx,       elbowIy, d, sw);
-  createLine('line-i-descent-h',  mIx,      elbowIy,  sibIMidx,  elbowIy, d, sw);
-  createLine('line-i-descent-v2', sibIMidx, elbowIy,  sibIMidx,  sibIy,   d, sw);
-
-  createLine('line-ii-sibship', C.p2_1.x, sibIy, C.p2_2.x, sibIy, d, sw);
-  createLine('line-ii-1-drop',  C.p2_1.x, sibIy, C.p2_1.x, C.p2_1.y, d, sw);
-  createLine('line-ii-3-drop',  C.p2_3.x, sibIy, C.p2_3.x, C.p2_3.y, d, sw);
-  createLine('line-ii-4-drop',  C.p2_4.x, sibIy, C.p2_4.x, C.p2_4.y, d, sw);
-  createLine('line-ii-2-drop',  C.p2_2.x, sibIy, C.p2_2.x, C.p2_2.y, d, sw);
-
-  createLine('line-ii-marriage', C.p2_2.x, C.p2_2.y, C.spouse.x, C.spouse.y, d, sw);
-
-  const mIIx      = (C.p2_2.x + C.spouse.x) / 2;
-  const sibIIy    = C.p3_1.y - 28;
-  const sibIIMidx = mIIx;
-  const elbowIIy  = C.p2_2.y + (sibIIy - C.p2_2.y) / 2;
-  createLine('line-ii-descent-v',  mIIx,      C.p2_2.y, mIIx,       elbowIIy, d, sw);
-  createLine('line-ii-descent-h',  mIIx,      elbowIIy, sibIIMidx,  elbowIIy, d, sw);
-  createLine('line-ii-descent-v2', sibIIMidx, elbowIIy, sibIIMidx,  sibIIy,   d, sw);
-
-  createLine('line-iii-sibship', C.p3_1.x, sibIIy, C.p3_4.x, sibIIy, d, sw);
-  createLine('line-iii-1-drop', C.p3_1.x, sibIIy, C.p3_1.x, C.p3_1.y, d, sw);
-  createLine('line-iii-3-drop', C.p3_3.x, sibIIy, C.p3_3.x, C.p3_3.y, d, sw);
-  createLine('line-iii-2-drop', C.p3_2.x, sibIIy, C.p3_2.x, C.p3_2.y, d, sw);
-  createLine('line-iii-4-drop', C.p3_4.x, sibIIy, C.p3_4.x, C.p3_4.y, d, sw);
-
-  alignGenLabels();
-}
-
-// ═══════════════════════════════════════════
-// RESET
-// ═══════════════════════════════════════════
-function resetAllPersons(){
-  ['p1_1','p1_2','p2_1','p2_3','p2_2','p2_4','spouse','p3_1','p3_3','p3_2','p3_4'].forEach(id=>{
-    const el=document.getElementById(id); if(!el)return;
-    const s=el.querySelector('.sym-shape');
-    const g=el.querySelector('.sym-gender-icon');
-    if(s){
-      s.style.fill   = '#2a2a28';
-      s.style.stroke = '#4a4a46';
-    }
-    if(g){ g.style.stroke = 'rgba(255,255,255,0.75)'; }
-    el.classList.remove('affected');el.style.filter='';el.style.color='';
-    const cf=document.getElementById(id+'-carrier');if(cf)cf.setAttribute('fill','none');
-  });
-}
-function resetLineColors(){
-  ['line-i-marriage','line-i-descent-v','line-i-descent-h','line-i-descent-v2',
-   'line-ii-sibship','line-ii-1-drop','line-ii-3-drop','line-ii-2-drop','line-ii-4-drop',
-   'line-ii-marriage','line-ii-descent-v','line-ii-descent-h','line-ii-descent-v2',
-   'line-iii-sibship','line-iii-1-drop','line-iii-3-drop','line-iii-2-drop','line-iii-4-drop']
-  .forEach(id=>{const el=document.getElementById(id);if(el){el.setAttribute('stroke','var(--line-default)');el.style.strokeDasharray='';el.style.strokeDashoffset='';el.style.transition='';}});
-}
-function resetChart(){
-  clearAllTimers();resetAllPersons();resetLineColors();resetGenLabels();
-  updateInfoPanel(null);
-  document.querySelectorAll('.btn').forEach(b=>b.classList.remove('active'));
-  currentMode=null;isPaused=false;
-  document.getElementById('btn-pause').innerHTML='⏸ Pause<span class="sh">Key: P</span>';
-}
-
-// ═══════════════════════════════════════════
-// LIGHT UP
-// ═══════════════════════════════════════════
-function lightUpPersons(ids,color,type){
-  ids.forEach(id=>{
-    const el=document.getElementById(id);if(!el)return;
-    const s=el.querySelector('.sym-shape');
-    const g=el.querySelector('.sym-gender-icon');
-    if(type==='affected'){
-      if(s){s.style.fill=color;s.style.stroke=color;}
-      if(g){g.style.stroke='rgba(255,255,255,0.92)';}
-      el.classList.add('affected');el.style.color=color;
-    }
-    else if(type==='carrier'){
-      const cf=document.getElementById(id+'-carrier');
-      if(cf){ cf.setAttribute('fill',color); cf.setAttribute('stroke', color); cf.setAttribute('stroke-width','0'); }
-      if(s) s.style.stroke=color;
-    }
-  });
-}
-function lightUpGen(personIds,mode,color){
-  lightUpPersons(mode.affected.filter(id=>personIds.includes(id)),color,'affected');
-  lightUpPersons(mode.carriers.filter(id=>personIds.includes(id)),color,'carrier');
-}
-
-// ═══════════════════════════════════════════
-// ANIMATE LINE SETS
-// ═══════════════════════════════════════════
-function animateGenILines(color){
-  const li=id=>document.getElementById(id);
-  const l=li('line-i-marriage');if(l){l.setAttribute('stroke',color);animateLine(l,480);}
-  later(()=>{const l=li('line-i-descent-v');if(l){l.setAttribute('stroke',color);animateLine(l,240);}},480);
-  later(()=>{const l=li('line-i-descent-h');if(l){l.setAttribute('stroke',color);animateLine(l,240);}},720);
-  later(()=>{const l=li('line-i-descent-v2');if(l){l.setAttribute('stroke',color);animateLine(l,180);}},960);
-  later(()=>{const l=li('line-ii-sibship');if(l){l.setAttribute('stroke',color);animateLine(l,360);}},1140);
-  later(()=>{ ['line-ii-1-drop','line-ii-3-drop','line-ii-4-drop','line-ii-2-drop'].forEach((lid,i)=>later(()=>{const l=li(lid);if(l){l.setAttribute('stroke',color);animateLine(l,270);}},i*85)); },1500);
-}
-function animateGenIILines(color){
-  const li=id=>document.getElementById(id);
-  const l=li('line-ii-marriage');if(l){l.setAttribute('stroke',color);animateLine(l,400);}
-  later(()=>{const l=li('line-ii-descent-v');if(l){l.setAttribute('stroke',color);animateLine(l,200);}},400);
-  later(()=>{const l=li('line-ii-descent-h');if(l){l.setAttribute('stroke',color);animateLine(l,200);}},600);
-  later(()=>{const l=li('line-ii-descent-v2');if(l){l.setAttribute('stroke',color);animateLine(l,160);}},800);
-  later(()=>{const l=li('line-iii-sibship');if(l){l.setAttribute('stroke',color);animateLine(l,320);}},960);
-  later(()=>{ ['line-iii-1-drop','line-iii-3-drop','line-iii-2-drop','line-iii-4-drop'].forEach((lid,i)=>later(()=>{const l=li(lid);if(l){l.setAttribute('stroke',color);animateLine(l,240);}},i*85)); },1280);
-}
-
-// ═══════════════════════════════════════════
-// RUN SIMULATION
-// ═══════════════════════════════════════════
-function runSimulation(modeKey){
-  const m=MODES[modeKey],color=m.color;
-  const seq=[
-    {t:0,   fn:()=>{glowGenLabel('i');lightUpGen(['p1_1','p1_2'],m,color);}},
-    {t:380, fn:()=>animateGenILines(color)},
-    {t:1900,fn:()=>{glowGenLabel('ii');lightUpGen(['p2_1','p2_3','p2_2','p2_4','spouse'],m,color);}},
-    {t:2260,fn:()=>animateGenIILines(color)},
-    {t:3600,fn:()=>{glowGenLabel('iii');lightUpGen(['p3_1','p3_3','p3_2','p3_4'],m,color);}},
-  ];
-  seq.forEach(({t,fn})=>later(fn,t));
-}
-
-// ═══════════════════════════════════════════
-// INFO PANEL
-// ═══════════════════════════════════════════
-function updateInfoPanel(modeKey){
-  const icon=document.getElementById('mode-icon'),name=document.getElementById('mode-name');
-  const desc=document.getElementById('mode-desc'),badge=document.getElementById('mode-badge');
-  const legAff=document.getElementById('leg-aff-svg'),legCar=document.getElementById('leg-car-svg');
-  const legCarItem=document.getElementById('leg-carrier');
-
-  if(!modeKey){
-    icon.textContent='◦';name.textContent='None';name.style.color='var(--text-dim)';
-    desc.textContent='Select an inheritance mode above to begin.';
-    badge.style.borderColor='var(--border)';
-    document.getElementById('prob-bars').innerHTML='';
-    document.getElementById('prob-mating').textContent='';
-    return;
-  }
-  const m=MODES[modeKey];
-  if(!m)return;
-  icon.textContent=m.icon;
-  name.innerHTML=m.name.replace('\n','<br>');
-  name.style.color=m.color;
-  desc.textContent=m.desc;
-  badge.style.borderColor=m.color;
-
-  legAff.innerHTML=`<rect x="1" y="1" width="18" height="18" rx="3" fill="${m.color}" stroke="${m.color}" stroke-width="1.5"/>`;
-  if(m.carriers.length>0){
-    legCar.innerHTML=`<circle cx="10" cy="10" r="8" fill="var(--surface)" stroke="${m.color}" stroke-width="1.5"/>
-      <path d="M10,2 A8,8 0 0,1 18,10 L10,10 Z" fill="${m.color}" opacity="0.7"/>`;
-    legCarItem.classList.remove('leg-hidden');
-  } else {
-    legCarItem.classList.add('leg-hidden');
-  }
-
-  // Probs
-  document.getElementById('prob-mating').textContent=m.probMating;
-  const barsEl=document.getElementById('prob-bars'); barsEl.innerHTML='';
-  m.probs.forEach(p=>{
-    const col=p.type==='affected'?m.color:p.type==='carrier'?m.color+'88':'var(--text-dim)';
-    const row=document.createElement('div'); row.className='prob-row';
-    row.innerHTML=`<span class="prob-lbl">${p.lbl}</span><div class="prob-bar-wrap"><div class="prob-bar" data-pct="${p.pct}" style="background:${col}"></div></div><span class="prob-pct">${p.pct}%</span>`;
-    barsEl.appendChild(row);
-  });
-  requestAnimationFrame(()=>{ barsEl.querySelectorAll('.prob-bar').forEach(b=>{b.style.transition='width .7s ease';b.style.width=b.dataset.pct+'%';}); });
-}
-
-// ═══════════════════════════════════════════
-// TOOLTIP
-// ═══════════════════════════════════════════
-function showTooltip(id,x,y){
-  if(!currentMode)return;
-  const m=MODES[currentMode]; if(!m)return;
-  const gt=m.genotypes[id]; if(!gt)return;
-  const tip=document.getElementById('gt-tooltip');
-  const isAff=m.affected.includes(id),isCar=m.carriers.includes(id);
-  document.getElementById('tt-gt').innerHTML=formatGT(gt.gt);
-  document.getElementById('tt-gt').style.color=isAff?m.color:isCar?m.color:'var(--text)';
-  document.getElementById('tt-lbl').textContent=gt.status;
-  tip.style.left=x+'px'; tip.style.top=y+'px'; tip.classList.add('vis');
-}
-function hideTooltip(){ document.getElementById('gt-tooltip').classList.remove('vis'); }
-
-function attachTooltips(){
-  Object.keys(PERSON_META).forEach(id=>{
-    const el=document.getElementById(id); if(!el)return;
-    el.addEventListener('mouseenter',e=>showTooltip(id,e.clientX,e.clientY-10));
-    el.addEventListener('mousemove',e=>{ const t=document.getElementById('gt-tooltip');t.style.left=e.clientX+'px';t.style.top=(e.clientY-10)+'px'; });
-    el.addEventListener('mouseleave',hideTooltip);
-  });
-}
-
-// ═══════════════════════════════════════════
-// INSPECT MODAL
-// ═══════════════════════════════════════════
-function inspectPerson(id){
-  if(!currentMode){
-    // CC panel open but no cross applied yet — silently ignore
-    return;
-  }
-  const m=MODES[currentMode];
-  if(!m)return;
-  const meta=PERSON_META[id], gt=m.genotypes?.[id];
-  if(!gt||!meta)return;
-  const isAff=m.affected.includes(id),isCar=m.carriers.includes(id),color=m.color;
-  const srcEl=document.getElementById(id);
-  if(srcEl) document.getElementById('modal-sym').innerHTML=srcEl.innerHTML;
-  document.getElementById('modal-bar').style.background=`linear-gradient(90deg,${color},transparent)`;
-  document.getElementById('modal-title').textContent=`${meta.label} · ${meta.name}`;
-  document.getElementById('modal-title').style.color=isAff?color:'var(--text)';
-  const genNum = id.startsWith('p1') ? 'I' : id.startsWith('p3') ? 'III' : 'II'; // p1_x → I, p3_x → III, p2_x + spouse → II
-  document.getElementById('modal-sub').textContent=`${meta.sex} · Generation ${genNum}`;
-  document.getElementById('modal-gt-box').style.borderColor=color;
-  document.getElementById('modal-gt-val').innerHTML=formatGT(gt.gt);
-  document.getElementById('modal-gt-val').style.color=color;
-  document.getElementById('modal-gt-status').textContent=gt.status;
-  document.getElementById('modal-gt-status').style.color=isAff?color:isCar?color:'var(--text-dim)';
-  document.getElementById('modal-exp-box').style.borderLeftColor=color;
-  document.getElementById('modal-exp-text').innerHTML=formatGT(gt.exp);
-  document.getElementById('modal-overlay').classList.add('open');
-}
-function closeModal(){ document.getElementById('modal-overlay').classList.remove('open'); }
-function maybeCloseModal(e){ if(e.target===document.getElementById('modal-overlay'))closeModal(); }
-
-
-
-// ═══════════════════════════════════════════
-// SET MODE
-// ═══════════════════════════════════════════
-function setMode(modeKey){
-  if(!MODES[modeKey])return;
-  // Close CC panel if open
-  const ccPanel=document.getElementById('cc-panel');
-  if(ccPanel&&ccPanel.classList.contains('open')){
-    ccPanel.classList.remove('open');
-    const ccBtn=document.getElementById('btn-cc');
-    if(ccBtn)ccBtn.classList.remove('active');
-  }
-  clearAllTimers();resetAllPersons();resetLineColors();resetGenLabels();
-  currentMode=modeKey; lastRealMode=modeKey; isPaused=false;
-  document.querySelectorAll('.btn:not(.btn-pause):not(.btn-reset)').forEach(b=>b.classList.remove('active'));
-  const ab=document.getElementById('btn-'+modeKey);if(ab)ab.classList.add('active');
-  document.getElementById('btn-pause').innerHTML='⏸ Pause<span class="sh">Key: P</span>';
-  updateInfoPanel(modeKey);
-  runSimulation(modeKey);
-}
-
-// ═══════════════════════════════════════════
-// CUSTOM CROSS ENGINE
-// ═══════════════════════════════════════════
-
-// Genotype definitions per mode and sex
-const CC_GENOTYPES = {
-  ad: {
-    male:   [{gt:'AA',status:'Affected',alleles:['A','A']}, {gt:'Aa',status:'Affected',alleles:['A','a']}, {gt:'aa',status:'Unaffected',alleles:['a','a']}],
-    female: [{gt:'AA',status:'Affected',alleles:['A','A']}, {gt:'Aa',status:'Affected',alleles:['A','a']}, {gt:'aa',status:'Unaffected',alleles:['a','a']}]
-  },
-  ar: {
-    male:   [{gt:'AA',status:'Unaffected',alleles:['A','A']}, {gt:'Aa',status:'Carrier',alleles:['A','a']}, {gt:'aa',status:'Affected',alleles:['a','a']}],
-    female: [{gt:'AA',status:'Unaffected',alleles:['A','A']}, {gt:'Aa',status:'Carrier',alleles:['A','a']}, {gt:'aa',status:'Affected',alleles:['a','a']}]
-  },
-  xlr: {
-    male:   [{gt:'XAY',status:'Unaffected',alleles:['XA','Y']}, {gt:'XaY',status:'Affected',alleles:['Xa','Y']}],
-    female: [{gt:'XAXA',status:'Unaffected',alleles:['XA','XA']}, {gt:'XAXa',status:'Carrier',alleles:['XA','Xa']}, {gt:'XaXa',status:'Affected',alleles:['Xa','Xa']}]
-  },
-  xld: {
-    male:   [{gt:'XAY',status:'Affected',alleles:['XA','Y']}, {gt:'XaY',status:'Unaffected',alleles:['Xa','Y']}],
-    female: [{gt:'XAXA',status:'Affected',alleles:['XA','XA']}, {gt:'XAXa',status:'Affected',alleles:['XA','Xa']}, {gt:'XaXa',status:'Unaffected',alleles:['Xa','Xa']}]
-  }
-};
-
-// ── CC-2 fix: largest-remainder rounding so percentages always sum to 100 ──
-function roundPercentages(results, total) {
-  if (!results.length || !total) return results.map(r => ({ ...r, pct: 0 }));
-  const floats = results.map(r => ({ ...r, floatPct: r.count / total * 100 }));
-  let remaining = 100;
-  floats.forEach(r => { r.pct = Math.floor(r.floatPct); remaining -= r.pct; });
-  floats
-    .map((r, i) => ({ i, frac: r.floatPct - Math.floor(r.floatPct) }))
-    .sort((a, b) => b.frac - a.frac)
-    .slice(0, Math.max(0, Math.round(remaining)))
-    .forEach(({ i }) => floats[i].pct++);
-  return floats;
-}
-
-// Determine phenotype from a pair of alleles + mode
-// CC-4 fix: always call with sorted alleles
-function ccPhenotype(a1, a2, mode) {
-  if (mode === 'ad') {
-    if (a1==='A'||a2==='A') return 'affected';
-    return 'unaffected';
-  }
-  if (mode === 'ar') {
-    if (a1==='a'&&a2==='a') return 'affected';
-    if (a1==='a'||a2==='a') return 'carrier';
-    return 'unaffected';
-  }
-  // X-linked: determine sex from Y
-  const hasMaleY = a1==='Y'||a2==='Y';
-  const xAlleles = [a1,a2].filter(a=>a!=='Y');
-  if (hasMaleY) {
-    if (mode === 'xlr') return xAlleles.includes('Xa') ? 'affected' : 'unaffected';
-    if (mode === 'xld') return xAlleles.includes('XA') ? 'affected' : 'unaffected';
-  } else {
-    if (mode === 'xlr') return (xAlleles[0]==='Xa'&&xAlleles[1]==='Xa') ? 'affected' : xAlleles.includes('Xa') ? 'carrier' : 'unaffected';
-    if (mode === 'xld') return xAlleles.includes('XA') ? 'affected' : 'unaffected';
-  }
-  return 'unaffected';
-}
-
-function sortAlleles(a1, a2, mode) {
-  if (a2 === 'Y') return [a1, 'Y'];
-  if (a1 === 'Y') return [a2, 'Y'];
-  if (mode === 'ad' || mode === 'ar') {
-    if (a1 === 'a' && a2 === 'A') return ['A', 'a'];
-    return [a1, a2];
-  }
-  if (mode === 'xld') {
-    const isDom = a => a === 'XA';
-    if (isDom(a2) && !isDom(a1)) return [a2, a1];
-    return [a1, a2];
-  }
-  if (mode === 'xlr') {
-    const isNormal = a => a === 'XA';
-    if (isNormal(a2) && !isNormal(a1)) return [a2, a1];
-    return [a1, a2];
-  }
-  return [a1, a2];
-}
-
-let ccState = {
-  fatherMode: 'ad', motherMode: 'ad',
-  fatherGT: null, motherGT: null,
-  spouseGT: null,   // CC-1 fix: explicit spouse selection
-  lastResult: null,
-  _probsRafId: null, // CC-8 fix: track pending animation frame
-  _rollSeed: null    // Bug-2 fix: null = deterministic, number = seeded random
-};
-
-function toggleCustomCross() {
-  const panel = document.getElementById('cc-panel');
-  const btn = document.getElementById('btn-cc');
-  const isOpen = panel.classList.toggle('open');
-  btn.classList.toggle('active', isOpen);
-  if (isOpen) {
-    // Clear all other mode button outlines immediately
-    document.querySelectorAll('.btn:not(.btn-cc):not(.btn-pause):not(.btn-reset)')
-      .forEach(b => b.classList.remove('active'));
-    // Stop any running simulation and blank the chart
-    clearAllTimers();
-    currentMode = null;
-    isPaused = false;
-    document.getElementById('btn-pause').innerHTML = '⏸ Pause<span class="sh">Key: P</span>';
-    resetAllPersons();
-    resetLineColors();
-    // Hide Re-roll — no cross applied yet
-    const rerollBtn = document.getElementById('cc-reroll-btn');
-    if (rerollBtn) rerollBtn.style.display = 'none';
-    ccState._rollSeed = null;
-    onCCModeChange();
-  } else {
-    // Panel closing — if CC was never applied (no currentMode), restore last real mode
-    if (currentMode !== 'cc') {
-      setMode(lastRealMode);
-    }
-  }
-}
-
-function syncCrossModes(changedParent) {
-  const other = changedParent === 'father' ? 'mother' : 'father';
-  const changedVal = document.getElementById(`cc-mode-${changedParent}`).value;
-  document.getElementById(`cc-mode-${other}`).value = changedVal;
-  onCCModeChange();
-}
-
-function onCCModeChange() {
-  ccState.fatherMode = document.getElementById('cc-mode-father').value;
-  ccState.motherMode = document.getElementById('cc-mode-mother').value;
-  ccState.fatherGT = null;
-  ccState.motherGT = null;
-  ccState.spouseGT = null;
-  ccState.lastResult = null;
-  ccState._rollSeed = null;
-  // Hide Re-roll — cross config changed, previous roll no longer valid
-  const rerollBtn = document.getElementById('cc-reroll-btn');
-  if (rerollBtn) rerollBtn.style.display = 'none';
-  renderCCGenotypeButtons('cc-gt-father', CC_GENOTYPES[ccState.fatherMode].male, 'father');
-  renderCCGenotypeButtons('cc-gt-mother', CC_GENOTYPES[ccState.motherMode].female, 'mother');
-  renderCCGenotypeButtons('cc-gt-spouse', CC_GENOTYPES[ccState.fatherMode].male, 'spouse');
-  document.getElementById('cc-result-area').style.display = 'none';
-}
-
-function renderCCGenotypeButtons(containerId, genotypes, parent) {
-  const el = document.getElementById(containerId);
-  el.innerHTML = '';
-  genotypes.forEach((g, i) => {
-    const btn = document.createElement('button');
-    btn.className = 'cc-gt-btn';
-    btn.innerHTML = `${formatGT(g.gt)}<span style="display:block;font-size:0.5rem;">${g.status}</span>`;
-    btn.title = g.status;
-    btn.onclick = () => selectCCGenotype(parent, i, g, btn);
-    el.appendChild(btn);
-  });
-}
-
-function selectCCGenotype(parent, idx, g, btnEl) {
-  const containerId = parent === 'father' ? 'cc-gt-father'
-                    : parent === 'mother' ? 'cc-gt-mother'
-                    : 'cc-gt-spouse'; // CC-1 fix
-  document.querySelectorAll(`#${containerId} .cc-gt-btn`).forEach(b => b.classList.remove('sel'));
-  btnEl.classList.add('sel');
-  if (parent === 'father')      ccState.fatherGT = g;
-  else if (parent === 'mother') ccState.motherGT = g;
-  else                          ccState.spouseGT = g;  // CC-1 fix
-  // CC-1 fix: require all three selections before computing
-  if (ccState.fatherGT && ccState.motherGT && ccState.spouseGT) computeAndDisplayCross();
-}
-
-// ── Build a cross results array from two parent allele arrays ──────────────
-function buildCrossResults(faAlleles, maAlleles, mode) {
-  const combos = [];
-  faAlleles.forEach(f => {
-    maAlleles.forEach(m => {
-      // CC-4 fix: sort first, then phenotype on sorted alleles
-      const sorted = sortAlleles(f, m, mode);
-      const pheno  = ccPhenotype(sorted[0], sorted[1], mode);
-      combos.push({ gt: sorted.join(''), a1: f, a2: m, pheno });
-    });
-  });
-  const tally = {};
-  combos.forEach(c => {
-    tally[c.gt] = tally[c.gt] || { gt: c.gt, pheno: c.pheno, count: 0 };
-    tally[c.gt].count++;
-  });
-  const total = combos.length;
-  // CC-2 fix: use largest-remainder rounding
-  const rawResults = Object.values(tally);
-  return { combos, results: roundPercentages(rawResults, total), total };
-}
-
-// ── CC-3 fix: robust allele lookup by gt string then by allele content ──────
-function findGenotypeEntry(pool, gt) {
-  if (!gt) return null;
-  // 1. Exact gt string match
-  const exact = pool.find(g => g.gt === gt);
-  if (exact) return exact;
-  // 2. Alleles joined in given order
-  const byJoin = pool.find(g => g.alleles.join('') === gt);
-  if (byJoin) return byJoin;
-  // 3. Sort by allele array (not by character) to handle reversed order
-  //    e.g. "XaXA" should match entry with alleles ["XA","Xa"]
-  const bySortedAlleles = pool.find(g => {
-    const sortedEntry = [...g.alleles].sort().join('');
-    // Reconstruct candidate alleles from gt using entry's allele length as unit size
-    const unitLen = g.alleles[0] ? g.alleles[0].length : 1;
-    const gtParts = [];
-    for (let i = 0; i + unitLen <= gt.length; i += unitLen) gtParts.push(gt.slice(i, i + unitLen));
-    return sortedEntry === [...gtParts].sort().join('');
-  });
-  return bySortedAlleles || null;
-}
-
-function computeAndDisplayCross() {
-  const fa = [...ccState.fatherGT.alleles]; // CC-10 fix: clone arrays
-  const ma = [...ccState.motherGT.alleles];
-  const sa = [...ccState.spouseGT.alleles]; // CC-1 fix
-
-  if (ccState.fatherMode !== ccState.motherMode) {
-    document.getElementById('cc-result-area').style.display = 'none';
-    console.warn('Custom Cross: mode mismatch — father:', ccState.fatherMode, 'mother:', ccState.motherMode);
-    return;
-  }
-  const mode = ccState.fatherMode;
-
-  // Gen I cross
-  const gen1 = buildCrossResults(fa, ma, mode);
-
-  // Gen III preview: show ALL possible Gen III outcomes weighted by II-2 probability
-  // II-2 is sampled from Gen I cross — compute weighted average across all possible II-2 genotypes
-  // For each possible II-2 genotype (from gen1 results), cross with spouse and weight by probability
-  const gen3Tally = {};
-  let gen3Total = 0;
-  gen1.results.forEach(p2_2Candidate => {
-    const p2_2Entry = findGenotypeEntry(CC_GENOTYPES[mode].female, p2_2Candidate.gt);
-    if (!p2_2Entry) return;
-    // Spouse (father) × II-2 candidate (mother)
-    const sub = buildCrossResults([...sa], [...p2_2Entry.alleles], mode);
-    sub.results.forEach(r => {
-      const key = r.gt;
-      gen3Tally[key] = gen3Tally[key] || { gt: r.gt, pheno: r.pheno, count: 0 };
-      // Weight by both the p2_2 probability and the sub-cross count
-      gen3Tally[key].count += (p2_2Candidate.pct / 100) * r.count;
-    });
-    gen3Total += p2_2Candidate.pct / 100 * sub.total;
-  });
-  const gen3RawResults = Object.values(gen3Tally);
-  const gen3Preview = gen3Total > 0
-    ? { results: roundPercentages(gen3RawResults.map(r => ({...r, count: Math.round(r.count * 100)})), Math.round(gen3Total * 100)) }
-    : { results: [] };
-
-  ccState.lastResult = {
-    combos: gen1.combos, results: gen1.results,
-    fa, ma, sa, mode, total: gen1.total,
-    gen3Results: gen3Preview.results, gen3Combos: gen3Preview.combos
-  };
-
-  renderPunnett(fa, ma, gen1.combos);
-
-  // CC-8 fix: cancel any pending rAF before re-rendering prob bars
-  if (ccState._probsRafId) cancelAnimationFrame(ccState._probsRafId);
-  renderCCProbs(gen1.results, 'cc-probs');
-  renderCCProbs(gen3Preview.results, 'cc-probs-gen3'); // CC-6 fix
-
-  document.getElementById('cc-result-area').style.display = 'block';
-}
-
-function phenoClass(pheno) {
-  if (pheno === 'affected') return 'affected';
-  if (pheno === 'carrier')  return 'carrier';
-  return 'unaffected';
-}
-
-function renderPunnett(fa, ma, combos) {
-  const el = document.getElementById('cc-punnett');
-  el.innerHTML = '';
-  const table = document.createElement('table');
-  table.className = 'cc-punnett';
-
-  const thead = table.createTHead();
-  const headerRow = thead.insertRow();
-  const corner = document.createElement('th');
-  corner.className = 'cc-punnett-cell header';
-  corner.textContent = '♂↓ / ♀→';
-  corner.setAttribute('scope', 'col'); // CC-9 fix
-  headerRow.appendChild(corner);
-  ma.forEach(m => {
-    const th = document.createElement('th');
-    th.className = 'cc-punnett-cell header';
-    th.innerHTML = `♀ ${formatGT(m)}`;
-    th.setAttribute('scope', 'col');
-    headerRow.appendChild(th);
-  });
-
-  const tbody = table.createTBody();
-  fa.forEach((f, fi) => {
-    const row = tbody.insertRow();
-    const rowHeader = document.createElement('th');
-    rowHeader.className = 'cc-punnett-cell header';
-    rowHeader.innerHTML = `♂ ${formatGT(f)}`;
-    rowHeader.setAttribute('scope', 'row');
-    row.appendChild(rowHeader);
-    for (let mi = 0; mi < ma.length; mi++) {
-      const idx = fi * ma.length + mi;
-      const c = combos[idx];
-      const td = row.insertCell();
-      td.className = 'cc-punnett-cell ' + phenoClass(c.pheno);
-      td.innerHTML = formatGT(c.gt);
-      td.title = c.pheno;
-    }
-  });
-  el.appendChild(table);
-}
-
-function renderCCProbs(results, containerId) {
-  const el = document.getElementById(containerId);
-  el.innerHTML = '';
-  results.forEach(r => {
-    const row = document.createElement('div');
-    row.className = 'cc-prob-row';
-    const barClass = r.pheno === 'affected' ? 'cc-prob-bar' : r.pheno === 'carrier' ? 'cc-prob-bar carrier-bar' : 'cc-prob-bar unaffected-bar';
-    row.innerHTML = `<span class="cc-prob-lbl">${formatGT(r.gt)} <span style="opacity:.55;font-size:.6rem">(${r.pheno})</span></span><div class="cc-prob-bar-wrap"><div class="${barClass}" data-pct="${r.pct}" style="width:0%"></div></div><span class="cc-prob-pct">${r.pct}%</span>`;
-    el.appendChild(row);
-  });
-  // CC-8 fix: store rAF id so it can be cancelled on re-render
-  ccState._probsRafId = requestAnimationFrame(() => {
-    ccState._probsRafId = null;
-    el.querySelectorAll('[data-pct]').forEach(b => {
-      b.style.transition = 'width .6s ease';
-      b.style.width = b.dataset.pct + '%';
-    });
-  });
-}
-
-// ── Bug-2 fix: deterministic by default; seeded random on re-roll ─────────
-// Mulberry32 — a fast, seedable 32-bit PRNG.
-function mulberry32(seed) {
-  return function() {
-    seed |= 0; seed = seed + 0x6D2B79F5 | 0;
-    let t = Math.imul(seed ^ seed >>> 15, 1 | seed);
-    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
-    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-  };
-}
-
-// Returns a pseudo-random function: deterministic (picks highest-weight outcome)
-// when seed is null, or seeded-random when seed is a number.
-function makeRng(seed) {
-  if (seed === null) {
-    // Deterministic: always return 0 → first (highest-count after sort) item wins.
-    // We pick the MODAL outcome — sort pool descending by count, roll = 0 picks slot 0.
-    return () => 0;
-  }
-  return mulberry32(seed);
-}
-
-function applyCCToChart(seed = null) {
-  if (!ccState.lastResult) return;
-  // Store seed so Re-roll can generate a fresh one
-  ccState._rollSeed = seed;
-  // Show Re-roll button after first apply
-  const rerollBtn = document.getElementById('cc-reroll-btn');
-  if (rerollBtn) rerollBtn.style.display = '';
-
-  const rng = makeRng(seed);
-  const { results, gen3Results, mode, fa, ma, sa } = ccState.lastResult;
-  const fGT = ccState.fatherGT;
-  const mGT = ccState.motherGT;
-  const sGT = ccState.spouseGT; // CC-1 fix: use user-selected spouse
-  const color = '#a78bfa';
-
-  const affected = [], carriers = [], genotypes = {};
-
-  function pickOffspring(comboResults, id, sex) {
-    if (!comboResults || comboResults.length === 0) {
-      console.warn('pickOffspring: empty comboResults for', id);
-      return null;
-    }
-    let pool = comboResults;
-    if (sex === 'male' || sex === 'female') {
-      const sexFiltered = comboResults.filter(r => {
-        const hasY = r.gt.includes('Y');
-        return sex === 'male' ? hasY : !hasY;
-      });
-      if ((mode === 'xlr' || mode === 'xld') && sexFiltered.length > 0) pool = sexFiltered;
-    }
-    if (pool.length === 0) pool = comboResults; // fallback to unfiltered
-
-    // Bug-2 fix: sort descending by count so rng()=0 always picks the modal outcome
-    pool = [...pool].sort((a, b) => b.count - a.count);
-
-    const poolTotal = pool.reduce((s, r) => s + r.count, 0);
-    if (poolTotal === 0) {
-      // All counts zero — just pick first entry
-      const res = pool[0];
-      genotypes[id] = { gt: res.gt, status: res.pheno.charAt(0).toUpperCase() + res.pheno.slice(1), exp: `Custom cross offspring: ${fGT.gt} × ${mGT.gt} → ${res.gt} (${res.pheno})` };
-      if (res.pheno === 'affected') affected.push(id);
-      if (res.pheno === 'carrier')  carriers.push(id);
-      return res;
-    }
-    const roll = rng() * poolTotal;
-    let cum = 0;
-    for (const res of pool) {
-      cum += res.count;
-      if (roll < cum) {
-        genotypes[id] = { gt: res.gt, status: res.pheno.charAt(0).toUpperCase() + res.pheno.slice(1), exp: `Custom cross offspring: ${fGT.gt} × ${mGT.gt} → ${res.gt} (${res.pheno})` };
-        if (res.pheno === 'affected') affected.push(id);
-        if (res.pheno === 'carrier')  carriers.push(id);
-        return res;
-      }
-    }
-    // Floating point edge: roll == poolTotal exactly
-    const last = pool[pool.length - 1];
-    genotypes[id] = { gt: last.gt, status: last.pheno.charAt(0).toUpperCase() + last.pheno.slice(1), exp: `Custom cross offspring: ${fGT.gt} × ${mGT.gt} → ${last.gt} (${last.pheno})` };
-    if (last.pheno === 'affected') affected.push(id);
-    if (last.pheno === 'carrier')  carriers.push(id);
-    return last;
-  }
-
-  // Gen I parents
-  genotypes.p1_1 = { gt: fGT.gt, status: fGT.status, exp: `Father genotype set by Custom Cross: ${fGT.gt}` };
-  genotypes.p1_2 = { gt: mGT.gt, status: mGT.status, exp: `Mother genotype set by Custom Cross: ${mGT.gt}` };
-  if (fGT.status === 'Affected') affected.push('p1_1');
-  if (fGT.status === 'Carrier')  carriers.push('p1_1');
-  if (mGT.status === 'Affected') affected.push('p1_2');
-  if (mGT.status === 'Carrier')  carriers.push('p1_2');
-
-  // Gen II children from Gen I cross
-  pickOffspring(results, 'p2_1', 'male');
-  pickOffspring(results, 'p2_3', 'male');
-  pickOffspring(results, 'p2_2', 'female');
-  pickOffspring(results, 'p2_4', 'female');
-
-  // CC-1 fix: spouse is now user-selected, not randomly sampled
-  genotypes.spouse = { gt: sGT.gt, status: sGT.status, exp: `Spouse: user-selected genotype (${sGT.gt}, ${sGT.status.toLowerCase()})` };
-  if (sGT.status === 'Affected') affected.push('spouse');
-  if (sGT.status === 'Carrier')  carriers.push('spouse');
-
-  // CC-3 fix: use robust findGenotypeEntry
-  // For X-linked, the sampled gt (e.g. "XAXa") must match female pool
-  const p2_2GTEntry = genotypes.p2_2;
-  const p2_2Entry = findGenotypeEntry(CC_GENOTYPES[mode].female, p2_2GTEntry ? p2_2GTEntry.gt : '');
-  const spouseEntry = findGenotypeEntry(CC_GENOTYPES[mode].male, sGT.gt);
-
-  let finalGen3Results = gen3Results; // fallback: preview computed at cross time
-  if (p2_2Entry && spouseEntry) {
-    // Recompute Gen III from p2_2's actual sampled alleles × spouse's alleles
-    const { results: freshGen3 } = buildCrossResults(
-      [...spouseEntry.alleles], [...p2_2Entry.alleles], mode  // father (spouse) × mother (p2_2)
-    );
-    finalGen3Results = freshGen3;
-  } else {
-    console.warn('applyCCToChart: could not resolve p2_2 or spouse entry for Gen III cross',
-      p2_2GTEntry, sGT.gt, 'in mode', mode);
-  }
-
-  function pickGen3Offspring(id, sex) {
-    // Update exp text for Gen III
-    const res = pickOffspring(finalGen3Results, id, sex);
-    if (res && genotypes[id]) {
-      genotypes[id].exp = `Custom cross Gen III: ${p2_2GTEntry.gt} (II-2) × ${sGT.gt} (Spouse) → ${genotypes[id].gt} (${res.pheno})`;
-    }
-  }
-  pickGen3Offspring('p3_1', 'male');
-  pickGen3Offspring('p3_3', 'male');
-  pickGen3Offspring('p3_2', 'female');
-  pickGen3Offspring('p3_4', 'female');
-
-  // CC-6 fix: probs in info panel show Gen III cross, not Gen I
-  const syntheticMode = {
-    color, icon: '✦', name: 'Custom\nCross',
-    desc: `Gen I: ${fGT.gt} × ${mGT.gt} | Gen II-2 × Spouse: ${mGT.gt} × ${sGT.gt}`,
-    affected, carriers, genotypes,
-    probMating: `${fGT.gt} (father) × ${mGT.gt} (mother) → Gen II; then II-2 × ${sGT.gt} (Spouse) → Gen III`,
-    probs: finalGen3Results.map(r => ({ lbl: `${r.gt} (${r.pheno})`, pct: r.pct, type: r.pheno }))
-  };
-
-  MODES['cc'] = syntheticMode;
-  clearAllTimers(); resetAllPersons(); resetLineColors(); resetGenLabels();
-  currentMode = 'cc'; isPaused = false;
-  document.querySelectorAll('.btn:not(.btn-pause):not(.btn-reset)').forEach(b => b.classList.remove('active'));
-  document.getElementById('btn-cc').classList.add('active');
-  document.getElementById('btn-pause').innerHTML = '⏸ Pause<span class="sh">Key: P</span>';
-  updateInfoPanel('cc');
-  runSimulation('cc');
-}
-
-
-// ── Bug-2 fix: intentional re-roll with a fresh random seed ──────────────
-function rerollCCChart() {
-  // Generate a new integer seed from the current timestamp — reproducible per
-  // click but different from the previous apply, so students see a new outcome.
-  applyCCToChart(Date.now() & 0x7FFFFFFF);
-}
-
-
-// ═══════════════════════════════════════════
-// INITIALIZE
-// ═══════════════════════════════════════════
-function initialize(){
-  // scheduleLayout (setTimeout → rAF) guarantees coordinates are read after a
-  // full browser layout+paint pass — reliable on all Android WebViews.
-  scheduleLayout();
-
-  const chartInner = document.getElementById('chart-inner');
-  if (chartInner && typeof ResizeObserver !== 'undefined') {
-    let roDebounce;
-    const ro = new ResizeObserver(() => {
-      clearTimeout(roDebounce);
-      roDebounce = setTimeout(() => {
-        clearAllTimers();
-        resetAllPersons(); resetLineColors();
-        document.getElementById('btn-pause').innerHTML='⏸ Pause<span class="sh">Key: P</span>';
-        scheduleLayout(() => {
-          if (currentMode) {
-            const tid = setTimeout(() => runSimulation(currentMode), 100);
-            timers.push(tid);
-          }
-        });
-      }, 120);
-    });
-    ro.observe(chartInner);
-  } else {
-    let rt;
-    window.addEventListener('resize', () => {
-      clearTimeout(rt); rt = setTimeout(() => {
-        clearAllTimers();
-        resetAllPersons(); resetLineColors();
-        document.getElementById('btn-pause').innerHTML='⏸ Pause<span class="sh">Key: P</span>';
-        scheduleLayout(() => {
-          if (currentMode) {
-            const tid = setTimeout(() => runSimulation(currentMode), 100);
-            timers.push(tid);
-          }
-        });
-      }, 150);
-    });
-  }
-
-  attachTooltips();
-  onCCModeChange();
-  document.addEventListener('keydown',e=>{
-    if(e.target.tagName==='INPUT'||e.target.tagName==='TEXTAREA'||e.target.tagName==='SELECT')return;
-    switch(e.key){
-      case '1':setMode('ad');break;case '2':setMode('ar');break;
-      case '3':setMode('xlr');break;case '4':setMode('xld');break;
-      case 'c':case 'C':toggleCustomCross();break;
-      case 'r':case 'R':resetChart();break;
-      case 'p':case 'P':togglePause();break;
-      case 'Escape':closeModal();break;
-    }
-  });
-  later(()=>setMode('xlr'),600);
-}
-window.addEventListener('DOMContentLoaded',initialize);
-</script>
+<script src="script.js"></script>
 </body>
 </html>
