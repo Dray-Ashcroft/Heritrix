@@ -1,20 +1,22 @@
 <p align="center">
-  <img src="banner/banner.png" alt="Heritrix — Pedigree and Mendelian Inheritance Simulator" width="100%">
+  <img src="assets/banner.png" alt="Heritrix — Pedigree and Mendelian Inheritance Simulator" width="100%">
 </p>
 
 <h1 align="center">Heritrix</h1>
 
 <p align="center"><em>Pedigree and Mendelian Inheritance Simulator</em></p>
 
-<p align="center"><a href="https://heritrix.stark-kodex.workers.dev"><strong>Explore Heriitrix<strong></a></p>
+<p align="center"><a href="https://heritrix.stark-kodex.workers.dev"><strong>Explore Heritrix</strong></a></p>
 
 <p align="center">
   <a href="#about">About</a> ·
   <a href="#screenshots">Screenshots</a> ·
   <a href="#modes">Modes</a> ·
   <a href="#controls">Controls</a> ·
+  <a href="#science">Science</a> ·
   <a href="#technology">Technology</a> ·
   <a href="#credits">Credits</a> ·
+  <a href="#releases">Releases</a> ·
   <a href="#license">License</a>
 </p>
 
@@ -35,37 +37,37 @@ Runs on phones, laptops and classroom smart panels, in light and dark themes.
 <table width="100%">
   <tr>
     <td width="25%" align="center">
-      <img src="screenshots/Meet%20Heritrix.png" alt="Heritrix start screen" width="100%">
+      <img src="assets/screenshots/01-meet-heritrix.png" alt="Heritrix start screen" width="100%">
       <br><sub><b>1 · Meet Heritrix</b></sub>
     </td>
     <td width="25%" align="center">
-      <img src="screenshots/Autosomal%20Dominant.png" alt="Autosomal dominant pedigree" width="100%">
+      <img src="assets/screenshots/02-autosomal-dominant.png" alt="Autosomal dominant pedigree" width="100%">
       <br><sub><b>2 · Autosomal Dominant</b></sub>
     </td>
     <td width="25%" align="center">
-      <img src="screenshots/Autosomal%20Recessive.png" alt="Autosomal recessive pedigree" width="100%">
+      <img src="assets/screenshots/03-autosomal-recessive.png" alt="Autosomal recessive pedigree" width="100%">
       <br><sub><b>3 · Autosomal Recessive</b></sub>
     </td>
     <td width="25%" align="center">
-      <img src="screenshots/X%20Linked%20Recessive.png" alt="X-linked recessive pedigree" width="100%">
+      <img src="assets/screenshots/04-x-linked-recessive.png" alt="X-linked recessive pedigree" width="100%">
       <br><sub><b>4 · X-Linked Recessive</b></sub>
     </td>
   </tr>
   <tr>
     <td width="25%" align="center">
-      <img src="screenshots/X%20Linked%20Dominant.png" alt="X-linked dominant pedigree" width="100%">
+      <img src="assets/screenshots/05-x-linked-dominant.png" alt="X-linked dominant pedigree" width="100%">
       <br><sub><b>5 · X-Linked Dominant</b></sub>
     </td>
     <td width="25%" align="center">
-      <img src="screenshots/Custom%20Cross%201.png" alt="Custom Cross builder" width="100%">
+      <img src="assets/screenshots/06-custom-cross.png" alt="Custom Cross builder" width="100%">
       <br><sub><b>6 · Custom Cross</b></sub>
     </td>
     <td width="25%" align="center">
-      <img src="screenshots/Custom%20cross%203.png" alt="Custom Cross pedigree chart" width="100%">
+      <img src="assets/screenshots/07-your-pedigree.png" alt="Custom Cross pedigree chart" width="100%">
       <br><sub><b>7 · Your Pedigree</b></sub>
     </td>
     <td width="25%" align="center">
-      <img src="screenshots/Custom%20cross%202.png" alt="Punnett squares and probabilities" width="100%">
+      <img src="assets/screenshots/08-punnett-squares.png" alt="Punnett squares and probabilities" width="100%">
       <br><sub><b>8 · Punnett Squares</b></sub>
     </td>
   </tr>
@@ -126,6 +128,36 @@ Runs on phones, laptops and classroom smart panels, in light and dark themes.
 
 ---
 
+## Science
+
+<details>
+<summary><b>Identifying the pattern</b></summary>
+
+| Pattern | Clues in a pedigree |
+|:--|:--|
+| Autosomal dominant | Appears in every generation · every affected child has an affected parent · males and females equally affected · Aa × aa → 50% of children affected |
+| Autosomal recessive | Can skip generations · unaffected carrier parents (Aa × Aa) have a 25% chance of an affected child · aa × aa → all children affected |
+| X-linked recessive | Far more males affected · affected sons usually have carrier mothers · no male-to-male transmission · an affected father passes X<sup>a</sup> to all his daughters |
+| X-linked dominant | Affected father → all daughters affected, no sons · affected heterozygous mother → 50% of sons and daughters affected |
+
+</details>
+
+<details>
+<summary><b>Monohybrid cross reference</b></summary>
+
+| Cross | Genotypes | Phenotypes |
+|:--|:--|:--|
+| Aa × Aa | 1 AA : 2 Aa : 1 aa | Dominant trait 3 : 1 · Recessive trait 1 : 3 (affected : unaffected) |
+| Aa × aa | 1 Aa : 1 aa | 1 : 1 |
+| AA × aa | All Aa | All show the dominant phenotype |
+| X<sup>A</sup>X<sup>a</sup> × X<sup>A</sup>Y | X<sup>A</sup>X<sup>A</sup> · X<sup>A</sup>X<sup>a</sup> · X<sup>A</sup>Y · X<sup>a</sup>Y | Recessive: half of sons affected, half of daughters carriers |
+
+Probabilities apply to each child independently, so a small family can differ from the expected ratio.
+
+</details>
+
+---
+
 ## Technology
 
 HTML · CSS · JavaScript · No external libraries · Cloudflare Workers
@@ -138,8 +170,8 @@ HTML · CSS · JavaScript · No external libraries · Cloudflare Workers
 | `index.html` | Page structure |
 | `style.css` | Styling, light and dark themes |
 | `script.js` | Pedigree animation, inheritance data and Custom Cross logic |
-| `screenshots/` | Screenshots for this README |
-| `assets/` | Banner |
+| `assets/banner.png` | README banner |
+| `assets/screenshots/` | README screenshots, numbered in display order |
 
 </details>
 
@@ -151,7 +183,7 @@ HTML · CSS · JavaScript · No external libraries · Cloudflare Workers
 |:--|:--|
 | **Sai Prasad**, M.Sc. Agri. Entomology, ASRB NET | Project Designer |
 | Claude Opus 5.5 | Development |
-| OpenAI GPT Luna 5.7 | Image Generation |
+| OpenAI Astra 6 | Image Generation |
 | Perplexity Sonar 2 | Scientific Reasoning |
 
 <details>
@@ -171,6 +203,8 @@ HTML · CSS · JavaScript · No external libraries · Cloudflare Workers
 |:--|:--|:--|
 | RC II | Revamp | 15 Nov 2026 |
 | RC I | Initial Release | 07 Jun 2026 |
+
+Full history: [CHANGELOG.md](CHANGELOG.md)
 
 ---
 
